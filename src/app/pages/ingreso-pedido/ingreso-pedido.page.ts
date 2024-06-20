@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AlertController,  ModalController } from '@ionic/angular';
+import { AlertController, ModalController, NavController } from '@ionic/angular';
 import { QueryService } from 'src/app/servicios/gql/query.service';
 import { HelperService } from 'src/app/servicios/helpers/helper.service';
 import { LoadingService } from 'src/app/servicios/loading.service';
@@ -28,6 +28,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { BusquedaPacientesPage } from '../busqueda-pacientes/busqueda-pacientes.page';
 import { SearchMedicoPage } from 'src/app/modals/orden/search-medico/search-medico.page';
 import { SearchPacientePage } from 'src/app/modals/orden/search-paciente/search-paciente.page';
+import { ListaPedidosPage } from '../lista-pedidos/lista-pedidos.page';
 
 
 @Component({
@@ -45,8 +46,8 @@ export class IngresoPedidoPage implements OnInit {
   maxDate: any;
 
   active_lugar_pedido = this.appConfig.active_lugar_pedido;
-  observaciones_pedido= this.appConfig.observaciones_pedido;
-  refentrega_pedido=this.appConfig.refentrega_pedido;
+  observaciones_pedido = this.appConfig.observaciones_pedido;
+  refentrega_pedido = this.appConfig.refentrega_pedido;
   mobile: any;
   ListaAnalisis: any = [];
   ListaAnalisisTemp: any = [];
@@ -59,15 +60,15 @@ export class IngresoPedidoPage implements OnInit {
 
   // ]
   ListEstado: any = [
-    { descripcion: "RUTINA", codigo: 0, icono: "calendar-number", color: "#008c33" },    
+    { descripcion: "RUTINA", codigo: 0, icono: "calendar-number", color: "#008c33" },
     { descripcion: "PRIORIDAD", codigo: 2, icono: "warning", color: "#ff790d" },
     { descripcion: "EMERGENCIA", codigo: 1, icono: "alarm", color: "#ff0000" },
-];
+  ];
 
 
-// { descripcion: "RUTINA", codigo: 0, icono: "alarm", color: "#ff9fb1" },
-//     { descripcion: "EMERGENCIA", codigo: 1, icono: "bed", color: "#bfdbbf" },
-//     { descripcion: "PRIORIDAD", codigo: 2, icono: "calendar-number-outline", color: "#eee3f1" },
+  // { descripcion: "RUTINA", codigo: 0, icono: "alarm", color: "#ff9fb1" },
+  //     { descripcion: "EMERGENCIA", codigo: 1, icono: "bed", color: "#bfdbbf" },
+  //     { descripcion: "PRIORIDAD", codigo: 2, icono: "calendar-number-outline", color: "#eee3f1" },
   lugar: any = {
     descripcion: null, codigo: null, enable: null
   };
@@ -87,9 +88,9 @@ export class IngresoPedidoPage implements OnInit {
   show_listaDiagnosticoextra: boolean = false;
   show_listaAnalisis: boolean = false;
   show_listaUnidad: boolean = false;
-  flag_listado_emergencias=false;
-  flag_emergencia=false;
-  flag_hospitalizacion=false;
+  flag_listado_emergencias = false;
+  flag_emergencia = false;
+  flag_hospitalizacion = false;
 
   ListDiagnostico: any = [];
   ListDiagnosticoextra: any = [];
@@ -99,18 +100,18 @@ export class IngresoPedidoPage implements OnInit {
 
   unidad: any = [];
   listUnidad: any = [];
-  flag_variable_turnos_paso:any;
-  NuevosAnalisis = []; 
-  ListAnalisis_tempo_update_pedido=[];
+  flag_variable_turnos_paso: any;
+  NuevosAnalisis = [];
+  ListAnalisis_tempo_update_pedido = [];
 
-  contador_turno_dia:any=0;
-  cont_rest_tur:any=0;
-  flag_color_rojo_turno:any=false;
-  elegir_variable:any;
-  id_pedidos_retorno_listado:any=null;
-  desactivar_segment_nombre_cedula:boolean=false;
-  variable_activar_fecha=false;
-  turno_hora_pedido:string;
+  contador_turno_dia: any = 0;
+  cont_rest_tur: any = 0;
+  flag_color_rojo_turno: any = false;
+  elegir_variable: any;
+  id_pedidos_retorno_listado: any = null;
+  desactivar_segment_nombre_cedula: boolean = false;
+  variable_activar_fecha = false;
+  turno_hora_pedido: string;
 
   paciente = {
     cod_pac: null,
@@ -141,9 +142,9 @@ export class IngresoPedidoPage implements OnInit {
     ca1_ord: null,
     cod_ref: null,
     hora_turno: null,
-    tipo_user:null,
-    pre_ord:0,
-    val_ord:0
+    tipo_user: null,
+    pre_ord: 0,
+    val_ord: 0
 
   }
 
@@ -162,7 +163,7 @@ export class IngresoPedidoPage implements OnInit {
 
   nro_turnos_pedidos_fecha = 0;
   nro_max_turnos = this.appConfig.max_pedidos_turno;
-  flag_variable_feriados:any;
+  flag_variable_feriados: any;
 
   pac_fec_nac_config: any;
   pac_sex_input_config: any
@@ -184,33 +185,33 @@ export class IngresoPedidoPage implements OnInit {
     hora: 0
   };
 
-  list_ordenesxpac=[];
-  list_peticionesxorden=[]
+  list_ordenesxpac = [];
+  list_peticionesxorden = []
 
-  id_plan_default_pedido:any=null;
-  flag_plan_default:boolean=false;
+  id_plan_default_pedido: any = null;
+  flag_plan_default: boolean = false;
   planSelected: any;
-  flag_active_turno_config_json:any=false;
+  flag_active_turno_config_json: any = false;
 
 
   ////////////////VARIABLES ANDY - CONTROL DE TURNOS///////
   hoy: string;
-  manana:string;
-  opcion_fecha_turnos_eme:string;
-  ref_tur_externo_ip:any;
-  ref_tur_emergencia_ip:any;
-  ref_tur_hospitalizacion_ip:any;
-  cont_max_turnos_every:any
-  cod_referencia:any;
-  flag_ocultar_fecha:any=false;
-  flag_ocultar_fecha_hoy:any=false;
-  flag_ocultar_fecha_manana:any=false;
+  manana: string;
+  opcion_fecha_turnos_eme: string;
+  ref_tur_externo_ip: any;
+  ref_tur_emergencia_ip: any;
+  ref_tur_hospitalizacion_ip: any;
+  cont_max_turnos_every: any
+  cod_referencia: any;
+  flag_ocultar_fecha: any = false;
+  flag_ocultar_fecha_hoy: any = false;
+  flag_ocultar_fecha_manana: any = false;
   placeholderNombre = "";
   placeholderCedula = "";
   bandera_icono_search: boolean = false;
   public nombre_paciente = "";//////////////No Borrar
   public cedula_paciente = "";//////////////No Borrar
-  selectedSegment:any;
+  selectedSegment: any;
 
 
   constructor(
@@ -227,36 +228,38 @@ export class IngresoPedidoPage implements OnInit {
     private appConfig: AppConfigService,
     private serviciosPDF: PdfRenderService,
     private validationService: ValidacionesService,
-
-  ) {   
+    private navCtrl: NavController,
     
+
+  ) {
+
     this.turno_hora_pedido = '';
     this.placeholderNombre = "Buscar...";
     this.placeholderCedula = "Buscar...";
-    this.selectedSegment="cedula"
+    this.selectedSegment = "cedula"
     ///Calculo de hoy dia
     this.hoy = this.helperservice.soloFecha(new Date());
     ////
     ////Calculo de mañana
-    let manana=new Date();
-    manana.setDate(manana.getDate()+1);
-    this.manana=this.helperservice.soloFecha(manana);  
+    let manana = new Date();
+    manana.setDate(manana.getDate() + 1);
+    this.manana = this.helperservice.soloFecha(manana);
     ///////
     ////Variables recuperadas desde ingreso config_des
-    this.ref_tur_externo_ip=this.appConfig.ref_tur_externo;
-    this.ref_tur_emergencia_ip=this.appConfig.ref_tur_emergencia;
-    this.ref_tur_hospitalizacion_ip=this.appConfig.ref_tur_hospitalizacion;
+    this.ref_tur_externo_ip = this.appConfig.ref_tur_externo;
+    this.ref_tur_emergencia_ip = this.appConfig.ref_tur_emergencia;
+    this.ref_tur_hospitalizacion_ip = this.appConfig.ref_tur_hospitalizacion;
     /////////
-    
-if(this.appConfig.active_turno===true){
-  this.flag_active_turno_config_json=true;
-}else{
-  this.flag_active_turno_config_json=false;
-}
-console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_config_json);
+
+    if (this.appConfig.active_turno === true) {
+      this.flag_active_turno_config_json = true;
+    } else {
+      this.flag_active_turno_config_json = false;
+    }
+    console.warn("flag_active_turno_config_json -Mirair", this.flag_active_turno_config_json);
 
     this.helperservice.checkFecha(6);
-    this.inputObservacion=(this.observaciones_pedido.default_msg && this.observaciones_pedido.default_msg!='')?this.observaciones_pedido.default_msg:""
+    this.inputObservacion = (this.observaciones_pedido.default_msg && this.observaciones_pedido.default_msg != '') ? this.observaciones_pedido.default_msg : ""
     if (this.appConfig.check_ped_ord) {
       this.queryservice.getCsParms({ cs_name: "AVATPED" }).then((r: any) => {
         // console.log('r cs', r);
@@ -269,26 +272,26 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
 
       })
     }
-    this.id_plan_default_pedido=this.appConfig.id_plan_default_pedido;
+    this.id_plan_default_pedido = this.appConfig.id_plan_default_pedido;
     // console.log('this.id_plan_default_pedido',this.id_plan_default_pedido);
 
-    if(this.id_plan_default_pedido!=undefined ){
-     if(this.id_plan_default_pedido!=null || this.id_plan_default_pedido!='') {
-      // console.log(" existe plan definido",this.id_plan_default_pedido);
-      this.queryservice.getPlanxIdplan({ id_plan: this.id_plan_default_pedido}).then((r: any) => {
-        // console.log("plan referencia", r);
-        this.planSelected = r.data.PlanxIdplan;
-        // console.log('this.planSelected', this.planSelected);
-        this.flag_plan_default=true;
-      }, error => {
-        // console.log(error);
+    if (this.id_plan_default_pedido != undefined) {
+      if (this.id_plan_default_pedido != null || this.id_plan_default_pedido != '') {
+        // console.log(" existe plan definido",this.id_plan_default_pedido);
+        this.queryservice.getPlanxIdplan({ id_plan: this.id_plan_default_pedido }).then((r: any) => {
+          // console.log("plan referencia", r);
+          this.planSelected = r.data.PlanxIdplan;
+          // console.log('this.planSelected', this.planSelected);
+          this.flag_plan_default = true;
+        }, error => {
+          // console.log(error);
 
-      })
-      
-     }
-      
+        })
+
+      }
+
     }
-    
+
     this.enable_hora_turno = this.appConfig.enabe_hora_turno;
     if (this.enable_hora_turno) {
       this.hora_turno = "00:00";
@@ -297,9 +300,9 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
     }
     this.getMaxTurnos();
 
-    
+
     this.des_usr = this.varGlobal.getVarUsuarioDes();
-    this.tipo_usr=this.varGlobal.getVarUsuarioTipo();
+    this.tipo_usr = this.varGlobal.getVarUsuarioTipo();
     // console.log('this.des_usr', this.des_usr);
     // console.log('this.tipo_usr', this.tipo_usr);
 
@@ -314,7 +317,7 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
     // console.log('this.lugar', this.lugar);
     if (this.varGlobal.getLugarPedido() != '') {
       this.lugar = this.ListLugar.filter(r => r.codigo == this.varGlobal.getLugarPedido())
-      console.log('This.lugar verificar ahora mismo: ', this.lugar); 
+      console.log('This.lugar verificar ahora mismo: ', this.lugar);
       this.lugar = this.lugar[0];
     }
 
@@ -328,14 +331,15 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
     if (this.lugar.codigo == 2) {
       this.checkTurno_avdg(this.lugar);
       this.estado = this.ListEstado[1]
-    } else { 
-      if(this.lugar.codigo==3){
+    } else {
+      if (this.lugar.codigo == 3) {
         this.checkTurno_avdg(this.lugar);
         this.estado = this.ListEstado[0]
-      }else{
+      } else {
         this.checkTurno_avdg(this.lugar);
-       this.estado = this.ListEstado[0] }
+        this.estado = this.ListEstado[0]
       }
+    }
   }
 
   async presentAlertLugar() {
@@ -349,14 +353,14 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
             handler: () => {
               console.log('Confirm Cancel: blah', element.descripcion);
               this.lugar = element
-              if(element.descripcion==="CONSULTA EXTERNA"){      
+              if (element.descripcion === "CONSULTA EXTERNA") {
                 console.log("Consulta Externaa");
-              if (this.lugar.codigo == 2) {
-                this.estado = this.ListEstado[1]
-              } else { this.estado = this.ListEstado[0] }
-              this.checkTurno_avdg(this.lugar);
+                if (this.lugar.codigo == 2) {
+                  this.estado = this.ListEstado[1]
+                } else { this.estado = this.ListEstado[0] }
+                this.checkTurno_avdg(this.lugar);
 
-              }else{
+              } else {
                 console.log("Otro tipo de turno");
                 if (this.lugar.codigo == 2) {
                   this.estado = this.ListEstado[1]
@@ -379,23 +383,23 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
 
   ionViewWillEnter() {
 
-    this.ListAnalisis_tempo_update_pedido=[];
+    this.ListAnalisis_tempo_update_pedido = [];
     this.ListaAnalisis = [];
-    
-    
-    this.lugar=[];
+
+
+    this.lugar = [];
     // this.pedido_duplicar='';
     this.minDate = new Date();
     this.minDate = this.helperservice.soloFecha(this.minDate)
     this.pedido_duplicar = this.varGlobal.getPedido_d();
     if (this.pedido_duplicar) {
-      
+
       let data = this.pedido_duplicar;
-      this.id_pedidos_retorno_listado=data.id_pedidos;
-      if(this.id_pedidos_retorno_listado!=null ){
-        this.desactivar_segment_nombre_cedula=true;
+      this.id_pedidos_retorno_listado = data.id_pedidos;
+      if (this.id_pedidos_retorno_listado != null) {
+        this.desactivar_segment_nombre_cedula = true;
       }
-      console.log("data id_pedidos_retorno_listado duplicar: ",this.id_pedidos_retorno_listado);
+      console.log("data id_pedidos_retorno_listado duplicar: ", this.id_pedidos_retorno_listado);
       this.inputCedula = data.Paciente.id_pac;
       this.inputObservacion = data.observaciones;
       this.inputHabitacion = data.nro_habitacion;
@@ -411,28 +415,28 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
       console.error('data.codigo_diagnostico2', data.codigo_diagnostico2);
       if (data.codigo_diagnostico2 != '' || data.codigo_diagnostico2 != null) {
         this.queryservice.getDiagnosticoById(data.codigo_diagnostico2).then((result: any) => {
-          console.log('resultdgetDiagnosticoById', result);          
-            this.diagnosticoextra = result.data.DiagnosticoId;          
+          console.log('resultdgetDiagnosticoById', result);
+          this.diagnosticoextra = result.data.DiagnosticoId;
         });
       }
       this.queryservice.getUnidadByCod(data.cod_unidad).then((result: any) => {
         console.log('unidad', result);
-        if(result.data!=null && result.data!=undefined && result.data!='') {
+        if (result.data != null && result.data != undefined && result.data != '') {
           this.unidad = result.data.getUnidadbyCod
-        }else{
+        } else {
           this.unidad = [];
         }
-        
+
       });
       data.Analisis.forEach(element => {
         this.inputAnalisis = element.cod_ana
         //this.searchAnalisis();
         this.searchAnalisisUpdate();
       });
-      console.log("entre duplicar en duplicar ultimo: ",this.pedido_duplicar);
-      this.lugar.codigo=this.pedido_duplicar.cod_lugar;
-      console.log("this.lugar en lugar: ",this.lugar);
-      this.turno_hora_pedido=this.pedido_duplicar.fec_examen;
+      console.log("entre duplicar en duplicar ultimo: ", this.pedido_duplicar);
+      this.lugar.codigo = this.pedido_duplicar.cod_lugar;
+      console.log("this.lugar en lugar: ", this.lugar);
+      this.turno_hora_pedido = this.pedido_duplicar.fec_examen;
       setTimeout(() => {
         this.varGlobal.setPedido_d(undefined);
       }, 2000)
@@ -447,19 +451,19 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
         nombre_lugar = 'EMERGENCIA';
         break;
       case 3:
-        nombre_lugar = 'CONSULTA EXTERNA';              
+        nombre_lugar = 'CONSULTA EXTERNA';
         break;
       default:
         break;
     }
-    
+
     this.lugar.descripcion = nombre_lugar;
 
     // this.checkTurno();
     this.checkTurno_avdg(this.lugar);
   }
   ngOnInit() {
-    
+
     let forden = new Date();
     let formatted_date = forden.getFullYear() + "-" + (forden.getMonth() + 1) + "-" + forden.getDate()
     this.dataOrden.fec_ord = this.helperservice.soloFecha(forden);
@@ -550,95 +554,95 @@ console.warn("flag_active_turno_config_json -Mirair",this.flag_active_turno_conf
             this.searchAnalisis();
           }
         }
-     
+
       }
     })
     return await modal.present();
   }
 
-/*
-  buscarAnalisis() {
-    if (this.inputAnalisis == '') {
-      this.toastservice.presentToast({ message: 'Ingrese el código de Análisis', position: "top", color: "warning" })
-      return
+  /*
+    buscarAnalisis() {
+      if (this.inputAnalisis == '') {
+        this.toastservice.presentToast({ message: 'Ingrese el código de Análisis', position: "top", color: "warning" })
+        return
+      }
+      this.queryservice.SearchAnalisxMstrs(this.inputAnalisis).then((result: any) => {
+        console.log(result);
+        if (result.data.AnalisisMstrsbyCod.length > 0) {
+          this.ListaAnalisis.push(result.data.AnalisisMstrsbyCod[0])
+          this.inputAnalisis = '';
+        } else {
+          this.toastservice.presentToast({ message: 'No se encontro el análisis con el codigo ingresado', color: 'warning', position: 'bottom' })
+        }
+      }, error => {
+        if (error.message) {
+          this.toastservice.presentToast({ message: 'Ocurrio un error <br>' + error.message, color: 'warning', position: 'bottom' })
+        }
+        else {
+          this.toastservice.presentToast({ message: 'Ocurrio un error <br>' + error, color: 'warning', position: 'bottom' })
+        } console.log('error', error);
+  
+      })
     }
-    this.queryservice.SearchAnalisxMstrs(this.inputAnalisis).then((result: any) => {
-      console.log(result);
-      if (result.data.AnalisisMstrsbyCod.length > 0) {
-        this.ListaAnalisis.push(result.data.AnalisisMstrsbyCod[0])
-        this.inputAnalisis = '';
-      } else {
-        this.toastservice.presentToast({ message: 'No se encontro el análisis con el codigo ingresado', color: 'warning', position: 'bottom' })
-      }
-    }, error => {
-      if (error.message) {
-        this.toastservice.presentToast({ message: 'Ocurrio un error <br>' + error.message, color: 'warning', position: 'bottom' })
-      }
-      else {
-        this.toastservice.presentToast({ message: 'Ocurrio un error <br>' + error, color: 'warning', position: 'bottom' })
-      } console.log('error', error);
-
-    })
-  }
-*/
-async eliminarAnalisis(index, item?) {
-  if (this.ListaAnalisis.length == 1) {
-    this.presentAlertListaUsuarios();
-  } else {
-    console.log("this Analisis: ",this.ListaAnalisis[index]);
-    const analisis = this.ListaAnalisis[index].des_ana; // Asume que esto es cómo obtienes el análisis
-    const alert = await this.alertController.create({
-      header: '!Estas Seguro¡',
-      message: 'De eliminar el análisis ' + analisis,
-      buttons: [{
-        text: "Si",
-        handler: () => {
-          console.log('ListaAnalisis analisis por favor :', this.ListaAnalisis)
-          console.log('item item item item :', item);
-          console.log('item duplicar :', this.pedido_duplicar);
-          if (this.pedido_duplicar != undefined && this.pedido_duplicar != '' && this.pedido_duplicar != null) {
-            let uuid_pedido = this.pedido_duplicar.uuid_pedido;
-            let id_pedido = this.pedido_duplicar.id_pedidos;
-            console.error('item cod_pac :', uuid_pedido);
-            this.queryservice.getTurnosbyUidd(uuid_pedido).then((result: any) => {
-              console.error('Resultado en id_turno: ', result)
-              let data = result.data.getTurnosbyUidd[0].id;
-              this.queryservice.DeleteTurxAnaPedido(data, item.cod_ana, id_pedido).then((result: any) => {
-                console.error('DeleteTurxAnaPedido en DeleteTurxAnaPedido: ', result)
-                let mensaje = result.data.DeleteTurxAnaPedido.mensaje;
-                if(mensaje==='0'){
-                  this.toastservice.presentToast({ message: "Eliminado correctamente", position: "buttom", color: "warning" });
-                  this.ListaAnalisis.splice(index, 1);
-                }else if(mensaje==='-1'){
-                  this.toastservice.presentToast({ message: "Eliminado correctamente", position: "buttom", color: "danger" });
-                  this.ListaAnalisis.splice(index, 1);
-              }                                                
-              });              
-            });
-          } else {
-            this.ListaAnalisis.splice(index, 1);
+  */
+  async eliminarAnalisis(index, item?) {
+    if (this.ListaAnalisis.length == 1) {
+      this.presentAlertListaUsuarios();
+    } else {
+      console.log("this Analisis: ", this.ListaAnalisis[index]);
+      const analisis = this.ListaAnalisis[index].des_ana; // Asume que esto es cómo obtienes el análisis
+      const alert = await this.alertController.create({
+        header: '!Estas Seguro¡',
+        message: 'De eliminar el análisis ' + analisis,
+        buttons: [{
+          text: "Si",
+          handler: () => {
+            console.log('ListaAnalisis analisis por favor :', this.ListaAnalisis)
+            console.log('item item item item :', item);
+            console.log('item duplicar :', this.pedido_duplicar);
+            if (this.pedido_duplicar != undefined && this.pedido_duplicar != '' && this.pedido_duplicar != null) {
+              let uuid_pedido = this.pedido_duplicar.uuid_pedido;
+              let id_pedido = this.pedido_duplicar.id_pedidos;
+              console.error('item cod_pac :', uuid_pedido);
+              this.queryservice.getTurnosbyUidd(uuid_pedido).then((result: any) => {
+                console.error('Resultado en id_turno: ', result)
+                let data = result.data.getTurnosbyUidd[0].id;
+                this.queryservice.DeleteTurxAnaPedido(data, item.cod_ana, id_pedido).then((result: any) => {
+                  console.error('DeleteTurxAnaPedido en DeleteTurxAnaPedido: ', result)
+                  let mensaje = result.data.DeleteTurxAnaPedido.mensaje;
+                  if (mensaje === '0') {
+                    this.toastservice.presentToast({ message: "Eliminado correctamente", position: "buttom", color: "warning" });
+                    this.ListaAnalisis.splice(index, 1);
+                  } else if (mensaje === '-1') {
+                    this.toastservice.presentToast({ message: "Eliminado correctamente", position: "buttom", color: "danger" });
+                    this.ListaAnalisis.splice(index, 1);
+                  }
+                });
+              });
+            } else {
+              this.ListaAnalisis.splice(index, 1);
+            }
+          }
+        },
+        {
+          text: "No",
+          handler: () => {
+            // No hacer nada
           }
         }
-      },
-      {
-        text: "No",
-        handler: () => {
-          // No hacer nada
-        }
-      }
-      ],
-      backdropDismiss: false
-    });
-    await alert.present();
+        ],
+        backdropDismiss: false
+      });
+      await alert.present();
+    }
   }
-}
 
 
   async presentAlertConirmacionEliminar(analisis) {
-    
+
     const alert = await this.alertController.create({
       header: '!Estas Seguro¡',
-      message: 'De eliminar el análisis '+analisis,
+      message: 'De eliminar el análisis ' + analisis,
       buttons: [{
         text: "Si",
         handler: () => {
@@ -652,13 +656,13 @@ async eliminarAnalisis(index, item?) {
         }
       }
       ],
-      backdropDismiss:false
+      backdropDismiss: false
     });
     await alert.present();
   }
-  
+
   async presentAlertListaUsuarios() {
-    
+
     const alert = await this.alertController.create({
       header: '!Alerta¡',
       message: 'El pedido debe tener al menos un análisis',
@@ -675,7 +679,7 @@ async eliminarAnalisis(index, item?) {
         }
       }
       ],
-      backdropDismiss:false
+      backdropDismiss: false
     });
     await alert.present();
   }
@@ -704,85 +708,84 @@ async eliminarAnalisis(index, item?) {
         }
       }
       ],
-      backdropDismiss:false
+      backdropDismiss: false
     });
 
     await alert.present();
   }
 
 
-  getPacienteByCod(cod_pac){
-    console.log("cod_pac getPaciente: ",cod_pac);
+  getPacienteByCod(cod_pac) {
+    console.log("cod_pac getPaciente: ", cod_pac);
     this.loadingservice.present('Cargar Paciente');
-    this.queryservice.getPacientesbyCod(cod_pac).then((result: any) =>
-      {      
-        let data;
-        data = result.data;
-        console.log('11: ',data);
-        if (data.getPacientebyCod != null) {
-          if (data.getPacientebyCod.cod_pac != null) {
-            this.paciente = data.getPacientebyCod;
-            console.log("paciente - paciente get Paciente: ",this.paciente);
-            if (this.check_ped_ord.active) {
-              console.log("CHECKEO ORDEn");
-              let fechas_check = this.helperservice.checkFecha(this.check_ped_ord.hora)
-              console.log('fechas_check', fechas_check);
-              this.queryservice.checkordbyfecha({
-                fecha_i: fechas_check.fecha_i,
-                fecha_h: fechas_check.fecha_h,
-                cod_pac: this.paciente.cod_pac
-              }).then((r:any)=>{
-                console.log("resss",r);
-                if(r.data.checkordbyfecha.length>0){
-                  let data=r.data.checkordbyfecha;
-                  this.presentAlertPacienteCheck()
-                  console.log(' this.list_ordenesxpac', this.list_ordenesxpac);
-                  let ordenes_list=""
-                  for (let index = 0; index < data.length; index++) {
-                    const element = data[index];
-                    ordenes_list+=element.nro_ord;
-                    if(index<(data.length-1))
-                    ordenes_list+=",";
-                  }
-                  this.queryservice.getPetxOrdenes({nro_ord_list:ordenes_list}).then((r:any)=>{
-                    this.list_peticionesxorden=[];
-                    console.log("r",r);
-                    let data_analisis=r.data.getPetxOrd
-  
-                    data_analisis.forEach(element => {
-                      this.list_peticionesxorden.push(element.cod_ana)
-                    });
-                  })
-                  console.log('ordenes_list',ordenes_list);
-                }                           
-              })            
-            }
-            this.loadingservice.dismiss();
+    this.queryservice.getPacientesbyCod(cod_pac).then((result: any) => {
+      let data;
+      data = result.data;
+      console.log('11: ', data);
+      if (data.getPacientebyCod != null) {
+        if (data.getPacientebyCod.cod_pac != null) {
+          this.paciente = data.getPacientebyCod;
+          console.log("paciente - paciente get Paciente: ", this.paciente);
+          if (this.check_ped_ord.active) {
+            console.log("CHECKEO ORDEn");
+            let fechas_check = this.helperservice.checkFecha(this.check_ped_ord.hora)
+            console.log('fechas_check', fechas_check);
+            this.queryservice.checkordbyfecha({
+              fecha_i: fechas_check.fecha_i,
+              fecha_h: fechas_check.fecha_h,
+              cod_pac: this.paciente.cod_pac
+            }).then((r: any) => {
+              console.log("resss", r);
+              if (r.data.checkordbyfecha.length > 0) {
+                let data = r.data.checkordbyfecha;
+                this.presentAlertPacienteCheck()
+                console.log(' this.list_ordenesxpac', this.list_ordenesxpac);
+                let ordenes_list = ""
+                for (let index = 0; index < data.length; index++) {
+                  const element = data[index];
+                  ordenes_list += element.nro_ord;
+                  if (index < (data.length - 1))
+                    ordenes_list += ",";
+                }
+                this.queryservice.getPetxOrdenes({ nro_ord_list: ordenes_list }).then((r: any) => {
+                  this.list_peticionesxorden = [];
+                  console.log("r", r);
+                  let data_analisis = r.data.getPetxOrd
+
+                  data_analisis.forEach(element => {
+                    this.list_peticionesxorden.push(element.cod_ana)
+                  });
+                })
+                console.log('ordenes_list', ordenes_list);
+              }
+            })
           }
-          else {
-            let toastconf =
-            {
-              'message': 'No se encontro el paciente',
-              'style': 'warning',
-              'position': 'top'
-            };
-            this.toastservice.presentToast((toastconf));
-            this.loadingservice.dismiss();
-            return
-          }
-        } else {
-          this.paciente.hidden = true
+          this.loadingservice.dismiss();
+        }
+        else {
           let toastconf =
           {
-            'message': 'No se encontro una persona con ese número de cédula',
+            'message': 'No se encontro el paciente',
             'style': 'warning',
             'position': 'top'
           };
           this.toastservice.presentToast((toastconf));
           this.loadingservice.dismiss();
           return
-        }  
-      },
+        }
+      } else {
+        this.paciente.hidden = true
+        let toastconf =
+        {
+          'message': 'No se encontro una persona con ese número de cédula',
+          'style': 'warning',
+          'position': 'top'
+        };
+        this.toastservice.presentToast((toastconf));
+        this.loadingservice.dismiss();
+        return
+      }
+    },
       (error) => {
         let toastconf =
         {
@@ -793,8 +796,8 @@ async eliminarAnalisis(index, item?) {
         this.loadingservice.dismiss();
         this.toastservice.presentToast((toastconf));
         return
-      
-      });  
+
+      });
   }
 
 
@@ -815,8 +818,8 @@ async eliminarAnalisis(index, item?) {
     }
     this.loadingservice.present('Cargar Paciente');
     // let data = this.queryservice.getPacientesbyId(this.inputCedula);
-  
-    let cedula="0401696034";
+
+    let cedula = "0401696034";
     let data = this.queryservice.getPacientesbyId(this.inputCedula);
     console.log('getPacientesbyId  - result: ', data);
 
@@ -824,11 +827,11 @@ async eliminarAnalisis(index, item?) {
       console.log('getPacientesbyId - result: ', result);
       let data;
       data = result.data;
-      console.log('data - datos resulta:',data);
+      console.log('data - datos resulta:', data);
       if (data.getPaciente != null) {
         if (data.getPaciente.id_pac != null) {
           this.paciente = data.getPaciente;
-          console.log('this.paciente - verificar asi : ',this.paciente);
+          console.log('this.paciente - verificar asi : ', this.paciente);
           if (this.check_ped_ord.active) {
             console.log("CHECKEO ORDEn");
             let fechas_check = this.helperservice.checkFecha(this.check_ped_ord.hora)
@@ -837,36 +840,36 @@ async eliminarAnalisis(index, item?) {
               fecha_i: fechas_check.fecha_i,
               fecha_h: fechas_check.fecha_h,
               cod_pac: this.paciente.cod_pac
-            }).then((r:any)=>{
-              console.log("resss",r);
-              if(r.data.checkordbyfecha.length>0){
-                let data=r.data.checkordbyfecha;
+            }).then((r: any) => {
+              console.log("resss", r);
+              if (r.data.checkordbyfecha.length > 0) {
+                let data = r.data.checkordbyfecha;
                 this.presentAlertPacienteCheck()
                 console.log(' this.list_ordenesxpac', this.list_ordenesxpac);
-                let ordenes_list=""
+                let ordenes_list = ""
                 for (let index = 0; index < data.length; index++) {
                   const element = data[index];
-                  ordenes_list+=element.nro_ord;
-                  if(index<(data.length-1))
-                  ordenes_list+=",";
+                  ordenes_list += element.nro_ord;
+                  if (index < (data.length - 1))
+                    ordenes_list += ",";
                 }
-                this.queryservice.getPetxOrdenes({nro_ord_list:ordenes_list}).then((r:any)=>{
-                  this.list_peticionesxorden=[];
-                  console.log("r",r);
-                  let data_analisis=r.data.getPetxOrd
+                this.queryservice.getPetxOrdenes({ nro_ord_list: ordenes_list }).then((r: any) => {
+                  this.list_peticionesxorden = [];
+                  console.log("r", r);
+                  let data_analisis = r.data.getPetxOrd
 
                   data_analisis.forEach(element => {
                     this.list_peticionesxorden.push(element.cod_ana)
                   });
                 })
-                console.log('ordenes_list',ordenes_list);
-              }                           
-            })            
+                console.log('ordenes_list', ordenes_list);
+              }
+            })
           }
           console.log("Else de elseeeeeee");
           this.loadingservice.dismiss();
           console.log("Iffffssss");
-        }else {
+        } else {
           let toastconf =
           {
             'message': 'No se encontro el paciente',
@@ -921,34 +924,34 @@ async eliminarAnalisis(index, item?) {
       this.paciente.hidden = true
   }
 
-/////Search update de vuelta//
+  /////Search update de vuelta//
 
-searchAnalisisUpdate() {
-  let data = this.queryservice.SearchAnalisxMstrs(this.inputAnalisis);
-  data.then(
-    (result: any) => {
-      let data = result.data.AnalisisMstrsbyCod
-      if (data.length > 0) {
-        this.analisis = data[0];
-        this.analisis.dcto_val = 0.00;
-        this.analisis.dcto_pet = 0.00;
-
-
-        console.error('this.analisis - error', this.analisis);
-        this.addAnalisis(this.analisis)
-      }      
-    },
-    (error) =>{}).finally(() => {
-    this.updatePreciosbyPlan('uno', this.analisis)
-    setTimeout(() => {}, 1000);
-}) 
-
-}
+  searchAnalisisUpdate() {
+    let data = this.queryservice.SearchAnalisxMstrs(this.inputAnalisis);
+    data.then(
+      (result: any) => {
+        let data = result.data.AnalisisMstrsbyCod
+        if (data.length > 0) {
+          this.analisis = data[0];
+          this.analisis.dcto_val = 0.00;
+          this.analisis.dcto_pet = 0.00;
 
 
+          console.error('this.analisis - error', this.analisis);
+          this.addAnalisis(this.analisis)
+        }
+      },
+      (error) => { }).finally(() => {
+        this.updatePreciosbyPlan('uno', this.analisis)
+        setTimeout(() => { }, 1000);
+      })
+
+  }
 
 
-/////////////////////////////////
+
+
+  /////////////////////////////////
 
 
   searchAnalisis() {
@@ -994,21 +997,21 @@ searchAnalisisUpdate() {
           this.analisis.dcto_pet = 0.00;
 
 
-       
+
 
           //this.analisis = JSON.parse(JSON.stringify(data[0]));
           this.addAnalisis(this.analisis)
-/*
-
-          let flag = false
-          this.ListaAnalisis.forEach(element => {
-            if (element.cod_ana == this.analisis.cod_ana) { flag = true }
-          });
-          if (!flag) {
-            this.ListaAnalisis.push(this.analisis);
-          }
-          this.inputAnalisis = ""
-          */
+          /*
+          
+                    let flag = false
+                    this.ListaAnalisis.forEach(element => {
+                      if (element.cod_ana == this.analisis.cod_ana) { flag = true }
+                    });
+                    if (!flag) {
+                      this.ListaAnalisis.push(this.analisis);
+                    }
+                    this.inputAnalisis = ""
+                    */
         }
         else {
           let toastconf =
@@ -1036,13 +1039,13 @@ searchAnalisisUpdate() {
       //this.calcTotal()
       this.updatePreciosbyPlan('uno', this.analisis)
       setTimeout(() => {
-       // this.calcTotal()
-       
+        // this.calcTotal()
+
 
       }, 1000);
-  }) 
+    })
 
-}
+  }
 
   saveComplete() {
     this.dataOrden.ca1_ord = this.ref_ca1_ord
@@ -1061,7 +1064,7 @@ searchAnalisisUpdate() {
     let Analisis_final = this.saveAnalisis();
     this.dataOrden.num_analisis = Analisis_final.length;
     this.dataOrden.hora_turno = this.hora_turno
-    this.dataOrden.tipo_user=this.tipo_usr
+    this.dataOrden.tipo_user = this.tipo_usr
     let json_data = {
       orden: this.dataOrden,
       analisis: Analisis_final
@@ -1080,17 +1083,17 @@ searchAnalisisUpdate() {
     this.queryservice.insertPedido(JSON.stringify(orden), JSON.stringify(analisis)).then((result: any) => {
       let data = result.data.insertPedido
       console.log('result mutation', result);
-      this.desactivar_segment_nombre_cedula=true;
+      this.desactivar_segment_nombre_cedula = true;
       if (data.resultado == 'error') {
         this.toastservice.presentToast({ message: data.mensaje, position: 'top', color: 'warning' })
         this.loadingservice.dismiss();
         return
-      }else{
-        console.log("Elegir variable",this.elegir_variable);
-        this.checkTurno_avdg(this.lugar,this.inputFechaExamen,this.elegir_variable);
-        
+      } else {
+        console.log("Elegir variable", this.elegir_variable);
+        this.checkTurno_avdg(this.lugar, this.inputFechaExamen, this.elegir_variable);
 
-        console.log("this.inputFechaExamenr - this.inputFechaExamen",this.inputFechaExamen);
+
+        console.log("this.inputFechaExamenr - this.inputFechaExamen", this.inputFechaExamen);
 
       }
       let nro_pedido_temp = data.data;
@@ -1301,11 +1304,11 @@ searchAnalisisUpdate() {
             }
           });
           if (!flag_repetido) {
-           element.dcto_val = 0.00;
-           element.dcto_pet = 0.00;
-  
-  
-  
+            element.dcto_val = 0.00;
+            element.dcto_pet = 0.00;
+
+
+
             this.ListaAnalisisTemp.push(element)
 
 
@@ -1330,44 +1333,44 @@ searchAnalisisUpdate() {
     })
   }
 
- 
-  flag_pass_repeat_analisis:boolean=false;
+
+  flag_pass_repeat_analisis: boolean = false;
 
   addAnalisis(data) {
-    console.log('data addAnalisis: ',data)   
-    let data_temp=[]
-    if(this.list_peticionesxorden.length>0){
-      data_temp=this.list_peticionesxorden.filter(peticion=>peticion==data.cod_ana)
-      if(data_temp.length>0 && !this.flag_pass_repeat_analisis){
+    console.log('data addAnalisis: ', data)
+    let data_temp = []
+    if (this.list_peticionesxorden.length > 0) {
+      data_temp = this.list_peticionesxorden.filter(peticion => peticion == data.cod_ana)
+      if (data_temp.length > 0 && !this.flag_pass_repeat_analisis) {
         console.log("es un analisis repetido");
-        let temp=this.presentAlertAnaRepeat(data);
-        console.log("tempppp",temp);       
+        let temp = this.presentAlertAnaRepeat(data);
+        console.log("tempppp", temp);
         return
-      }else{
-        console.log("ListaAnalisis verificar antes12: ",this.ListaAnalisis);
+      } else {
+        console.log("ListaAnalisis verificar antes12: ", this.ListaAnalisis);
         this.ListaAnalisis.push(data);
-             
 
-            
+
+
         this.toastservice.presentToast({ message: "Analisis añadido al listado", position: "top", color: "success" })
-        this.flag_pass_repeat_analisis=false;    
-          //this.calcTotal()
-          this.updatePreciosbyPlan('uno', this.analisis)
-          setTimeout(() => {
-            this.calcTotal()
-          }, 1000)  
+        this.flag_pass_repeat_analisis = false;
+        //this.calcTotal()
+        this.updatePreciosbyPlan('uno', this.analisis)
+        setTimeout(() => {
+          this.calcTotal()
+        }, 1000)
       }
     }
-    else{
-      console.log("ListaAnalisis verificar antes: ",this.ListaAnalisis);
+    else {
+      console.log("ListaAnalisis verificar antes: ", this.ListaAnalisis);
       this.ListaAnalisis.push(data);
-      console.log("ListaAnalisis verificar final: ",this.ListaAnalisis);
-     this.updatePreciosbyPlan('uno', this.analisis)
+      console.log("ListaAnalisis verificar final: ", this.ListaAnalisis);
+      this.updatePreciosbyPlan('uno', this.analisis)
       setTimeout(() => {
         this.calcTotal()
       }, 1000)
 
- //   this.toastservice.presentToast({ message: "Analisis añadido al listado", position: "top", color: "success" })    
+      //   this.toastservice.presentToast({ message: "Analisis añadido al listado", position: "top", color: "success" })    
     }
     this.inputAnalisis = ""
     setTimeout(() => {
@@ -1378,25 +1381,27 @@ searchAnalisisUpdate() {
   async presentAlertAnaRepeat(data) {
     const alert = await this.alertController.create({
       header: 'Cuidado',
-      subHeader:data.des_ana,
+      subHeader: data.des_ana,
       message: 'Ya existe esta petición ingresada para este paciente,\n Ingresar de todos modos.',
-      backdropDismiss:false,
+      backdropDismiss: false,
       buttons: [
         {
-          text:"Continuar",
-          handler:()=>{
-           this.flag_pass_repeat_analisis=true;
-           this.addAnalisis(data)
-      }
-    },{
-      text:"Cancelar",
-      handler:()=>{
-      }
-    }]
+          text: "Continuar",
+          handler: () => {
+            this.flag_pass_repeat_analisis = true;
+            this.addAnalisis(data)
+          }
+        }, {
+          text: "Cancelar",
+          handler: () => {
+          }
+        }]
     });
-  
+
     await alert.present();
   }
+
+
 
 
   async getIdturnoPedidos(uuid_pedido) {
@@ -1411,25 +1416,88 @@ searchAnalisisUpdate() {
     return data;
   }
 
+  asu
+
+
   async presentAlertUpdate() {
+    this.ListAnalisis_tempo_update_pedido = [];
     console.log('presentAlertUpdate: presentAlertUpdate: ', this.ListaAnalisis);
     console.log('pedidos id: ', this.pedido_duplicar.id_pedidos);
+    let array_turno_array = [];
     let id_turno = await this.getIdturnoPedidos(this.pedido_duplicar.uuid_pedido);
     for (const element of this.ListaAnalisis) {
       console.log('element cod Ana: ', element.cod_ana);
       const result: any = await this.queryservice.getAnalisisPedidosTurno(this.pedido_duplicar.id_pedidos, element.cod_ana);
       console.error("Resultado de getAnalisisPedidosTurno: ", result);
       if (result.data.getAnalisisPedidosTurno.mensaje === '-1') {
-        this.ListAnalisis_tempo_update_pedido.push(element);        
+        this.ListAnalisis_tempo_update_pedido.push(element);
         console.log("id_turno presentAlertUpdate: ", id_turno);
       }
     }
-    this.ListAnalisis_tempo_update_pedido.push({ id_pedidos: this.pedido_duplicar.id_pedidos });        
-    this.ListAnalisis_tempo_update_pedido.push({ id_turno: id_turno });
-    this.ListAnalisis_tempo_update_pedido.push({ numero_ana: this.ListAnalisis_tempo_update_pedido.length });
-    console.log("Lista de analisis arreglo: ", this.ListAnalisis_tempo_update_pedido);
 
-    console.log("No existe el análisis en la tabla de pedidos: ", JSON.stringify(this.ListAnalisis_tempo_update_pedido));
+    array_turno_array.push({ id_pedidos: this.pedido_duplicar.id_pedidos, id_turno: id_turno, num_ana: this.ListAnalisis_tempo_update_pedido.length });
+
+    // this.ListAnalisis_tempo_update_pedido.push({ id_pedidos: this.pedido_duplicar.id_pedidos });        
+    // this.ListAnalisis_tempo_update_pedido.push({ id_turno: id_turno });
+    // this.ListAnalisis_tempo_update_pedido.push(this.ListAnalisis_tempo_update_pedido);
+    console.log("ListAnalisis_tempo_update_pedido: ", this.ListAnalisis_tempo_update_pedido);
+    console.log("Si ListAnalisis_tempo_update_pedidos: ", JSON.stringify(this.ListAnalisis_tempo_update_pedido));
+    console.log("Lista de array_turno_array array_turno_array: ", array_turno_array);
+    console.log("No array_turno_array el análisis en la tabla de pedidos: ", JSON.stringify(array_turno_array));
+
+    this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido);
+
+    // console.log("No existe el análisis en la tabla de pedidos: ", JSON.stringify(this.ListAnalisis_tempo_update_pedido));
+  }
+
+  async presentAddAnalisisPedido(json_datos, json_ana, lista?) {
+    const alert = await this.alertController.create({
+      header: '! Esta Seguro !',
+      message: '<div style="text-align:center">! De Modificar este pedido !</div>',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: "Si",
+          handler: () => {
+            this.queryservice.insertPedAnaxTur(json_datos, json_ana).then((result: any) => {
+              console.log("result insertPedAnaxTur en verificacion: ", result);
+              if(result.data.insertPedAnaxTur.data === "0"){
+                this.toastservice.presentToast({ message: result.data.insertPedAnaxTur.mensaje, position: "buttom", color: "success" })
+                this.presentViewUpdatePedido(this.pedido_duplicar);
+                this.LimpiarTodo();
+              }else if(result.data.insertPedAnaxTur.data === "-1"){
+                this.toastservice.presentToast({ message: result.data.insertPedAnaxTur.mensaje, position: "buttom", color: "danger" })
+                this.LimpiarTodo();
+              }              
+            });
+        }
+        }, {
+          text: "No",
+          handler: () => {
+            
+          }
+        }]
+    });
+    await alert.present();
+  }
+
+  async presentViewUpdatePedido(lista_pedidos) {
+console.log("pedidos -+----: ", lista_pedidos);
+
+
+this.router.navigate(['/lista-pedidos'], { state: { lista_pedidos: lista_pedidos } });
+
+// this.navCtrl.navigateForward('/lista-pedidos');
+
+      //     const modal = await this.modalcontroller.create({
+      //   component: ListaPedidosPage,
+      //   componentProps: {
+      //     'lista_pedidos': lista_pedidos
+      //   }
+      // });
+      // await modal.present();
+      // modal.onDidDismiss().then((result: any) => {
+      // })
   }
 
   async presentAlertGuardar() {
@@ -1478,18 +1546,18 @@ searchAnalisisUpdate() {
         return
       }
     }
-    
-    console.error("this.flag_listado_emergencias",this.flag_listado_emergencias);
-    if(this.flag_active_turno_config_json===true){
-    if(this.flag_listado_emergencias===true) {
-      if (this.nro_max_turnos <= 0 || this.cont_rest_tur<0) {
-        this.toastservice.presentToast({ message: 'No existe turnos en el día, Cambie de dia', position: "bottom", color: "danger"})
-          return      
-      }else if(this.cont_rest_tur>=this.nro_max_turnos ){
-        this.toastservice.presentToast({ message: 'No existe turnos en el día, Cambie de dia', position: "bottom", color: "danger"})
-        return 
-      }      
-    }
+
+    console.error("this.flag_listado_emergencias", this.flag_listado_emergencias);
+    if (this.flag_active_turno_config_json === true) {
+      if (this.flag_listado_emergencias === true) {
+        if (this.nro_max_turnos <= 0 || this.cont_rest_tur < 0) {
+          this.toastservice.presentToast({ message: 'No existe turnos en el día, Cambie de dia', position: "bottom", color: "danger" })
+          return
+        } else if (this.cont_rest_tur >= this.nro_max_turnos) {
+          this.toastservice.presentToast({ message: 'No existe turnos en el día, Cambie de dia', position: "bottom", color: "danger" })
+          return
+        }
+      }
     }
 
 
@@ -1509,7 +1577,7 @@ searchAnalisisUpdate() {
         }, {
           text: 'Aceptar',
           handler: () => {
-          this.saveComplete();
+            this.saveComplete();
           }
         }
       ]
@@ -1521,68 +1589,68 @@ searchAnalisisUpdate() {
 
   async presentModalNuevoPaciente(cod_pac?) {
 
-    console.log("Codigo de paciente verificar por favor: ",cod_pac);
-if(cod_pac!=null && cod_pac!=undefined && cod_pac!=''){
-  const modal = await this.modalcontroller.create({
-    component: CrearpacientePage,
-    componentProps: {
-        'cod_pac_temp': cod_pac
-    }
-});
-await modal.present();
-modal.onDidDismiss().then((result: any) => {  
-  console.log("result - regreso: ",result);
-  // data.data_pac.id_pac
-  this.queryservice.getPacientesbyCod(result.data.data_pac.cod_pac).then((result: any) => {
-    console.log('result pac', result);
-    let data = result.data.getPacientebyCod;
-    if (data) {
-      this.paciente = data;
-      this.inputCedula = this.paciente.id_pac;
-      this.disabled_cedula = true;
-    }
-  });
-  
-});
-}else{
-    const modal = await this.modalcontroller.create({
-      component: CrearpacientePage,
-    });
-    await modal.present();
-    modal.onDidDismiss().then((result: any) => {
-      console.log('result - data P', result);
-      if (result.role == 'data') {
-        switch (result.data.tipo) {
-          case "insert":
-            let dat_pac = result.data.data_pac[0];
-            if (dat_pac) {
-              this.queryservice.getPacientesbyCod(dat_pac.cod_pac).then((result: any) => {
-                console.log('result pac', result);
-                let data = result.data.getPacientebyCod;
+    console.log("Codigo de paciente verificar por favor: ", cod_pac);
+    if (cod_pac != null && cod_pac != undefined && cod_pac != '') {
+      const modal = await this.modalcontroller.create({
+        component: CrearpacientePage,
+        componentProps: {
+          'cod_pac_temp': cod_pac
+        }
+      });
+      await modal.present();
+      modal.onDidDismiss().then((result: any) => {
+        console.log("result - regreso: ", result);
+        // data.data_pac.id_pac
+        this.queryservice.getPacientesbyCod(result.data.data_pac.cod_pac).then((result: any) => {
+          console.log('result pac', result);
+          let data = result.data.getPacientebyCod;
+          if (data) {
+            this.paciente = data;
+            this.inputCedula = this.paciente.id_pac;
+            this.disabled_cedula = true;
+          }
+        });
+
+      });
+    } else {
+      const modal = await this.modalcontroller.create({
+        component: CrearpacientePage,
+      });
+      await modal.present();
+      modal.onDidDismiss().then((result: any) => {
+        console.log('result - data P', result);
+        if (result.role == 'data') {
+          switch (result.data.tipo) {
+            case "insert":
+              let dat_pac = result.data.data_pac[0];
+              if (dat_pac) {
+                this.queryservice.getPacientesbyCod(dat_pac.cod_pac).then((result: any) => {
+                  console.log('result pac', result);
+                  let data = result.data.getPacientebyCod;
+                  if (data) {
+                    this.paciente = data;
+                    this.inputCedula = this.paciente.id_pac;
+                    this.disabled_cedula = true;
+                  }
+                })
+              }
+              break;
+            case "check":
+              this.queryservice.getPacientesbyId(result.data.data_pac.id_pac).then((result: any) => {
+                console.log("result pac modal", result);
+                let data = result.data.getPaciente;
                 if (data) {
                   this.paciente = data;
                   this.inputCedula = this.paciente.id_pac;
                   this.disabled_cedula = true;
                 }
               })
-            }
-            break;
-          case "check":
-            this.queryservice.getPacientesbyId(result.data.data_pac.id_pac).then((result: any) => {
-              console.log("result pac modal", result);
-              let data = result.data.getPaciente;
-              if (data) {
-                this.paciente = data;
-                this.inputCedula = this.paciente.id_pac;
-                this.disabled_cedula = true;
-              }
-            })
-            break;
-          default: return;
+              break;
+            default: return;
+          }
         }
-      }
-    });
-  }
+      });
+    }
   }
 
   eliminarDiagnostico() {
@@ -1618,12 +1686,12 @@ modal.onDidDismiss().then((result: any) => {
   }
 
   changelugar(event) {
-    
+
     console.log("Entro en donde yo decidi enviar");
     this.ListLugar.forEach(element => {
       if (element.codigo == event.detail.value) {
         this.lugar = element
-        console.log("this.lugar  verificar-: ",this.lugar);
+        console.log("this.lugar  verificar-: ", this.lugar);
         this.checkTurno_avdg(this.lugar);
         return
       }
@@ -1635,7 +1703,7 @@ modal.onDidDismiss().then((result: any) => {
     let forden = new Date();
     this.variable_activar_fecha
     this.resetpaciente();
-    this.desactivar_segment_nombre_cedula=false;
+    this.desactivar_segment_nombre_cedula = false;
     this.ListaAnalisis = [];
     this.ListaAnalisisTemp = [];
     this.diagnostico = [];
@@ -1645,15 +1713,15 @@ modal.onDidDismiss().then((result: any) => {
     this.diagnosticoextra = [];
     this.unidad = [];
     this.inputHabitacion = '';
-   // this.inputFechaExamen = this.helperservice.soloFecha(forden);
+    // this.inputFechaExamen = this.helperservice.soloFecha(forden);
     this.disabled_cedula = false;
-    this.total_ord='';
-    console.log("this.elegir_variable:  elegigir Variab="+this.elegir_variable);
+    this.total_ord = '';
+    console.log("this.elegir_variable:  elegigir Variab=" + this.elegir_variable);
 
-if(this.elegir_variable===undefined || this.elegir_variable==='' || this.elegir_variable===null){
-   this.inputFechaExamen=this.helperservice.soloFecha(forden);  
-}
-this.checkTurno_avdg(this.lugar,this.inputFechaExamen,this.elegir_variable);
+    if (this.elegir_variable === undefined || this.elegir_variable === '' || this.elegir_variable === null) {
+      this.inputFechaExamen = this.helperservice.soloFecha(forden);
+    }
+    this.checkTurno_avdg(this.lugar, this.inputFechaExamen, this.elegir_variable);
 
     if (!this.appConfig.lugar_default && this.appConfig.active_lugar_pedido) {
       this.presentAlertLugar();
@@ -1709,236 +1777,236 @@ this.checkTurno_avdg(this.lugar,this.inputFechaExamen,this.elegir_variable);
     let day = date.getDate();
     let monthString = month < 10 ? '0' + month : '' + month;
     let dayString = day < 10 ? '0' + day : '' + day;
-    return `${year}-${monthString}-${dayString}`;     
+    return `${year}-${monthString}-${dayString}`;
   }
 
-  checkTurno_avdg(lugar,fecha?,variable?){
-    console.log('Entro a turnos verificar ahora Lugar',lugar);
-    console.log('Entro a turnos verificar ahora Fecha',fecha);
-    if(lugar.descripcion==="CONSULTA EXTERNA" ){
-      console.warn('inputdate:::::::::::',this.inputFechaExamen);
-      
-        //////
-        if(this.inputFechaExamen === undefined || this.inputFechaExamen === null || this.inputFechaExamen === ''){
-          let currentDate = new Date();
-          let year = currentDate.getFullYear();
-          let month = currentDate.getMonth() + 1;
-          let day = currentDate.getDate();
-          let monthString = month < 10 ? '0' + month : '' + month;
-          let dayString = day < 10 ? '0' + day : '' + day;
-          this.inputFechaExamen = `${year}-${monthString}-${dayString}`;          
-        }
+  checkTurno_avdg(lugar, fecha?, variable?) {
+    console.log('Entro a turnos verificar ahora Lugar', lugar);
+    console.log('Entro a turnos verificar ahora Fecha', fecha);
+    if (lugar.descripcion === "CONSULTA EXTERNA") {
+      console.warn('inputdate:::::::::::', this.inputFechaExamen);
 
-        ///////////
-      this.flag_consulta_externa=true;      
-      this.flag_listado_emergencias = true;
-      this.flag_hospitalizacion=false;
-      this.flag_emergencia=true;
-      this.flag_ocultar_fecha=false;
-      if(this.pedido_duplicar!==null && this.pedido_duplicar!==undefined){
-        this.inputFechaExamen = this.formatTime(new Date(this.pedido_duplicar.fec_examen));
-        console.log('pedido duplicar mod: ',this.inputFechaExamen);
-
-      }
-      
-      this.checkTurno();
-    }else if(lugar.descripcion==="EMERGENCIA" ){
-      console.log('FALSE DE EMERGENCIA');
-
-if(this.desactivar_segment_nombre_cedula){
-  this.variable_activar_fecha=true;
-}
-
-
-     this.flag_consulta_externa=false;
-     this.flag_listado_emergencias = false; 
-     this.flag_emergencia=true;
-     this.flag_hospitalizacion=false;
-     this.flag_ocultar_fecha=true;      
-     if(fecha===undefined){   
-      this.inputFechaExamen = this.metodoTransformarDate(this.inputFechaExamen);
-    }else{
-      this.inputFechaExamen=fecha;
-    }  
-    switch(variable) {
-      case undefined:
-      case null:
-      case '':
-      case 'h':
-        this.opcion_fecha_turnos_eme = 'hoy';
-        console.warn('inputa de fecha hoy::: ',this.inputFechaExamen);
-
-        this.checkTurno(this.inputFechaExamen);
-        break;
-      case 'm':
-        this.opcion_fecha_turnos_eme = 'manana';
-        console.warn('inputa de fecha manana::: ',this.inputFechaExamen);
-        this.checkTurno(this.inputFechaExamen);
-        break;
-      default:
-        // manejar cualquier otro caso aquí si es necesario
-        break;
-     }
-    }else if(lugar.descripcion==="HOSPITALIZACION" ){
-     //this.opcion_fecha_turnos_eme = 'hoy';
-     console.log('FALSE DE VARIABLE DE VARIABLE * fdsf: '+variable);     
-
-     
-      console.log('FECHA EN FECHA - HOSPITALIZACION:::::::::::',fecha);
-      if(fecha===undefined){   
-        this.inputFechaExamen = this.metodoTransformarDate(this.inputFechaExamen);
-      }else{
-        this.inputFechaExamen=fecha;
-      }
-      console.log('inputdate - HOSPITALIZACION1995:::::::::::',this.inputFechaExamen);
-     this.flag_listado_emergencias = false;
-     this.flag_consulta_externa=false;     
-     this.flag_hospitalizacion=true;
-     this.flag_ocultar_fecha=true;        
-     switch(variable) {
-      case undefined:
-      case null:
-      case '':
-      case 'h':
-        this.opcion_fecha_turnos_eme = 'hoy';
-        console.warn('inputa de fecha hoy::: ',this.inputFechaExamen);
-
-        this.checkTurno(this.inputFechaExamen);
-        break;
-      case 'm':
-        this.opcion_fecha_turnos_eme = 'manana';
-        console.warn('inputa de fecha manana::: ',this.inputFechaExamen);
-        this.checkTurno(this.inputFechaExamen);
-        break;
-      default:
-        // manejar cualquier otro caso aquí si es necesario
-        break;
-     }
-    }
-
-  }
-
-
-metodoTransformarDate (fecha):string{
-  let currentDate = new Date();
+      //////
+      if (this.inputFechaExamen === undefined || this.inputFechaExamen === null || this.inputFechaExamen === '') {
+        let currentDate = new Date();
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth() + 1;
         let day = currentDate.getDate();
         let monthString = month < 10 ? '0' + month : '' + month;
         let dayString = day < 10 ? '0' + day : '' + day;
-        return    `${year}-${monthString}-${dayString}`;      
-}
-  
-  async checkTurno(fecha_date?) {
-    
-    // console.log("Ingreso al momento indicado para verificar"+fecha_date);
-     this.flag_listado_emergencias = true;
-      this.list_tunos_hora_ocupados=null;
-
-      if(this.inputFechaExamen === undefined || this.inputFechaExamen === null || this.inputFechaExamen === ''){
-             this.inputFechaExamen=this.metodoTransformarDate(this.inputFechaExamen);
+        this.inputFechaExamen = `${year}-${monthString}-${dayString}`;
       }
-      // console.log('inputdate::::::::::: - checkTurno',this.inputFechaExamen);
-      this.queryservice.getFeriadobyFechabyEvery(this.inputFechaExamen).then
-        ((result_fer: any) => {
-          if (result_fer) {
-            console.error('resultado de feraido------',result_fer);
+
+      ///////////
+      this.flag_consulta_externa = true;
+      this.flag_listado_emergencias = true;
+      this.flag_hospitalizacion = false;
+      this.flag_emergencia = true;
+      this.flag_ocultar_fecha = false;
+      if (this.pedido_duplicar !== null && this.pedido_duplicar !== undefined) {
+        this.inputFechaExamen = this.formatTime(new Date(this.pedido_duplicar.fec_examen));
+        console.log('pedido duplicar mod: ', this.inputFechaExamen);
+
+      }
+
+      this.checkTurno();
+    } else if (lugar.descripcion === "EMERGENCIA") {
+      console.log('FALSE DE EMERGENCIA');
+
+      if (this.desactivar_segment_nombre_cedula) {
+        this.variable_activar_fecha = true;
+      }
 
 
-            this.flag_variable_feriados = result_fer.data.getFeriadobyFechabyEvery.fec_fer;
-            console.error('this.flag_variable_feriados------',this.flag_variable_feriados);
-            
-            if (this.flag_variable_feriados !== null) {
-              console.error('Entra a consulta feriados if ver------: ',result_fer.data.getFeriadobyFechabyEvery);
-              console.error('this.Plan------',this.lugar); 
-              if(this.lugar.descripcion==="CONSULTA EXTERNA" ){
-                this.cont_max_turnos_every=result_fer.data.getFeriadobyFechabyEvery.max_turnos;
-                this.cod_referencia=this.ref_tur_externo_ip;
-              }else if(this.lugar.descripcion==="EMERGENCIA" ){
-                this.cont_max_turnos_every=result_fer.data.getFeriadobyFechabyEvery.max_emer;
-                this.cod_referencia=this.ref_tur_emergencia_ip;
-              }if(this.lugar.descripcion==="HOSPITALIZACION" ){
-                this.cont_max_turnos_every=result_fer.data.getFeriadobyFechabyEvery.max_hosp;
-                this.cod_referencia=this.ref_tur_hospitalizacion_ip;
-              }              
-              // console.log("this.cont_max_turnos_every: ",this.cont_max_turnos_every);        
-              // console.log("this.this.cod_referencia: ",this.cod_referencia);        
-              //this.nro_max_turnos = this.flag_variable_feriados;
-              this.nro_max_turnos =this.cont_max_turnos_every;
-              this.queryservice.getMobFechasTurnos(this.inputFechaExamen,this.cod_referencia).then((result: any) => {
-                this.contador_turno_dia = result.data.getMobFechasTurnos.data;
-                let resultado = result.data.getMobFechasTurnos.resultado;
-                if (resultado === 0) {
-                  this.nro_max_turnos = 0;
-                }              
-                this.cont_rest_tur = this.contador_turno_dia;                                                              
-                if (this.cont_rest_tur >= this.nro_max_turnos) {
-                  this.cont_rest_tur = this.cont_rest_tur;
-                  this.flag_color_rojo_turno=true;
-                }else{
-                  this.flag_color_rojo_turno=false;
-                  this.getHourxTurno(this.inputFechaExamen);
-                }                      
-              });
-            } else {
+      this.flag_consulta_externa = false;
+      this.flag_listado_emergencias = false;
+      this.flag_emergencia = true;
+      this.flag_hospitalizacion = false;
+      this.flag_ocultar_fecha = true;
+      if (fecha === undefined) {
+        this.inputFechaExamen = this.metodoTransformarDate(this.inputFechaExamen);
+      } else {
+        this.inputFechaExamen = fecha;
+      }
+      switch (variable) {
+        case undefined:
+        case null:
+        case '':
+        case 'h':
+          this.opcion_fecha_turnos_eme = 'hoy';
+          console.warn('inputa de fecha hoy::: ', this.inputFechaExamen);
 
-              if(this.lugar.descripcion==="CONSULTA EXTERNA" ){                
-                this.cod_referencia=this.ref_tur_externo_ip;
-              }else if(this.lugar.descripcion==="EMERGENCIA" ){                
-                this.cod_referencia=this.ref_tur_emergencia_ip;
-              }if(this.lugar.descripcion==="HOSPITALIZACION" ){                
-                this.cod_referencia=this.ref_tur_hospitalizacion_ip;
-              }   
-              // console.error('Entra a consulta feriados else------',this.cod_referencia);
-              // console.error('Entra Examen else------',this.inputFechaExamen);
-             // this.queryservice.getMobFechasTurnos(this.inputFechaExamen,this.cod_referencia).then((result: any) => {
-              this.queryservice.getMobFechasTurnos(this.inputFechaExamen,this.cod_referencia).then(async (result: any) => {
-                // console.log("Resultado para getMobFechasTurnos: ", result);
-                this.contador_turno_dia = result.data.getMobFechasTurnos.data;
-                let resultado = result.data.getMobFechasTurnos.resultado;
-                if (resultado === "0") {
-                  this.nro_max_turnos = 0;
-                } else {
-                 await this.getMaxTurnos();
-                  // console.log('Verificando 11: ',this.nro_max_turnos);                                                     
-                }                  
-                // console.log('Verificando 2: ',this.nro_max_turnos);                                                     
-                                   
-                this.cont_rest_tur = this.contador_turno_dia; 
-               
-                // console.log("cont_rest_tur - VERIFCANDO", this.cont_rest_tur);
-                // console.log("nro_max_turnos - VERIFCANDO", this.nro_max_turnos);
-                if (typeof this.cont_rest_tur === 'string') {
-                  this.cont_rest_tur = parseInt(this.cont_rest_tur, 10);                
-                  if (isNaN(this.cont_rest_tur)) {
-                    // console.error('Error converting cont_rest_tur to integer');
-                  }
-                }      
-                // console.log("nro_max_turnos - VERIFCANDO22", this.nro_max_turnos);  
-                // console.log("cont_rest_tur - VERIFCANDO22", this.cont_rest_tur);
-                // console.log('flag_variable_turnos_paso - flag_variable_turnos_paso: '+this.flag_variable_turnos_paso);                                                               
-                  if (this.cont_rest_tur >= this.nro_max_turnos) {
-                    this.cont_rest_tur = this.cont_rest_tur;
-                    // console.error("cont_rest_tur - cont_rest_tur 1", this.cont_rest_tur);
-                    this.flag_color_rojo_turno=true;
-         
-                  }else{
-                    this.flag_color_rojo_turno=false;
-                    this.getHourxTurno(this.inputFechaExamen);
-              
-                  }  
-                  if(this.nro_max_turnos>this.flag_variable_turnos_paso+1){
-                    // console.log('Entroo nro maximoturnos  : '+this.nro_max_turnos);                                                     
-  
-                    this.flag_color_rojo_turno=true;
-                  }              
-              });
+          this.checkTurno(this.inputFechaExamen);
+          break;
+        case 'm':
+          this.opcion_fecha_turnos_eme = 'manana';
+          console.warn('inputa de fecha manana::: ', this.inputFechaExamen);
+          this.checkTurno(this.inputFechaExamen);
+          break;
+        default:
+          // manejar cualquier otro caso aquí si es necesario
+          break;
+      }
+    } else if (lugar.descripcion === "HOSPITALIZACION") {
+      //this.opcion_fecha_turnos_eme = 'hoy';
+      console.log('FALSE DE VARIABLE DE VARIABLE * fdsf: ' + variable);
+
+
+      console.log('FECHA EN FECHA - HOSPITALIZACION:::::::::::', fecha);
+      if (fecha === undefined) {
+        this.inputFechaExamen = this.metodoTransformarDate(this.inputFechaExamen);
+      } else {
+        this.inputFechaExamen = fecha;
+      }
+      console.log('inputdate - HOSPITALIZACION1995:::::::::::', this.inputFechaExamen);
+      this.flag_listado_emergencias = false;
+      this.flag_consulta_externa = false;
+      this.flag_hospitalizacion = true;
+      this.flag_ocultar_fecha = true;
+      switch (variable) {
+        case undefined:
+        case null:
+        case '':
+        case 'h':
+          this.opcion_fecha_turnos_eme = 'hoy';
+          console.warn('inputa de fecha hoy::: ', this.inputFechaExamen);
+
+          this.checkTurno(this.inputFechaExamen);
+          break;
+        case 'm':
+          this.opcion_fecha_turnos_eme = 'manana';
+          console.warn('inputa de fecha manana::: ', this.inputFechaExamen);
+          this.checkTurno(this.inputFechaExamen);
+          break;
+        default:
+          // manejar cualquier otro caso aquí si es necesario
+          break;
+      }
+    }
+
+  }
+
+
+  metodoTransformarDate(fecha): string {
+    let currentDate = new Date();
+    let year = currentDate.getFullYear();
+    let month = currentDate.getMonth() + 1;
+    let day = currentDate.getDate();
+    let monthString = month < 10 ? '0' + month : '' + month;
+    let dayString = day < 10 ? '0' + day : '' + day;
+    return `${year}-${monthString}-${dayString}`;
+  }
+
+  async checkTurno(fecha_date?) {
+
+    // console.log("Ingreso al momento indicado para verificar"+fecha_date);
+    this.flag_listado_emergencias = true;
+    this.list_tunos_hora_ocupados = null;
+
+    if (this.inputFechaExamen === undefined || this.inputFechaExamen === null || this.inputFechaExamen === '') {
+      this.inputFechaExamen = this.metodoTransformarDate(this.inputFechaExamen);
+    }
+    // console.log('inputdate::::::::::: - checkTurno',this.inputFechaExamen);
+    this.queryservice.getFeriadobyFechabyEvery(this.inputFechaExamen).then
+      ((result_fer: any) => {
+        if (result_fer) {
+          console.error('resultado de feraido------', result_fer);
+
+
+          this.flag_variable_feriados = result_fer.data.getFeriadobyFechabyEvery.fec_fer;
+          console.error('this.flag_variable_feriados------', this.flag_variable_feriados);
+
+          if (this.flag_variable_feriados !== null) {
+            console.error('Entra a consulta feriados if ver------: ', result_fer.data.getFeriadobyFechabyEvery);
+            console.error('this.Plan------', this.lugar);
+            if (this.lugar.descripcion === "CONSULTA EXTERNA") {
+              this.cont_max_turnos_every = result_fer.data.getFeriadobyFechabyEvery.max_turnos;
+              this.cod_referencia = this.ref_tur_externo_ip;
+            } else if (this.lugar.descripcion === "EMERGENCIA") {
+              this.cont_max_turnos_every = result_fer.data.getFeriadobyFechabyEvery.max_emer;
+              this.cod_referencia = this.ref_tur_emergencia_ip;
+            } if (this.lugar.descripcion === "HOSPITALIZACION") {
+              this.cont_max_turnos_every = result_fer.data.getFeriadobyFechabyEvery.max_hosp;
+              this.cod_referencia = this.ref_tur_hospitalizacion_ip;
             }
+            // console.log("this.cont_max_turnos_every: ",this.cont_max_turnos_every);        
+            // console.log("this.this.cod_referencia: ",this.cod_referencia);        
+            //this.nro_max_turnos = this.flag_variable_feriados;
+            this.nro_max_turnos = this.cont_max_turnos_every;
+            this.queryservice.getMobFechasTurnos(this.inputFechaExamen, this.cod_referencia).then((result: any) => {
+              this.contador_turno_dia = result.data.getMobFechasTurnos.data;
+              let resultado = result.data.getMobFechasTurnos.resultado;
+              if (resultado === 0) {
+                this.nro_max_turnos = 0;
+              }
+              this.cont_rest_tur = this.contador_turno_dia;
+              if (this.cont_rest_tur >= this.nro_max_turnos) {
+                this.cont_rest_tur = this.cont_rest_tur;
+                this.flag_color_rojo_turno = true;
+              } else {
+                this.flag_color_rojo_turno = false;
+                this.getHourxTurno(this.inputFechaExamen);
+              }
+            });
           } else {
-            console.warn("No hay resultados de feriados: ");
+
+            if (this.lugar.descripcion === "CONSULTA EXTERNA") {
+              this.cod_referencia = this.ref_tur_externo_ip;
+            } else if (this.lugar.descripcion === "EMERGENCIA") {
+              this.cod_referencia = this.ref_tur_emergencia_ip;
+            } if (this.lugar.descripcion === "HOSPITALIZACION") {
+              this.cod_referencia = this.ref_tur_hospitalizacion_ip;
+            }
+            // console.error('Entra a consulta feriados else------',this.cod_referencia);
+            // console.error('Entra Examen else------',this.inputFechaExamen);
+            // this.queryservice.getMobFechasTurnos(this.inputFechaExamen,this.cod_referencia).then((result: any) => {
+            this.queryservice.getMobFechasTurnos(this.inputFechaExamen, this.cod_referencia).then(async (result: any) => {
+              // console.log("Resultado para getMobFechasTurnos: ", result);
+              this.contador_turno_dia = result.data.getMobFechasTurnos.data;
+              let resultado = result.data.getMobFechasTurnos.resultado;
+              if (resultado === "0") {
+                this.nro_max_turnos = 0;
+              } else {
+                await this.getMaxTurnos();
+                // console.log('Verificando 11: ',this.nro_max_turnos);                                                     
+              }
+              // console.log('Verificando 2: ',this.nro_max_turnos);                                                     
+
+              this.cont_rest_tur = this.contador_turno_dia;
+
+              // console.log("cont_rest_tur - VERIFCANDO", this.cont_rest_tur);
+              // console.log("nro_max_turnos - VERIFCANDO", this.nro_max_turnos);
+              if (typeof this.cont_rest_tur === 'string') {
+                this.cont_rest_tur = parseInt(this.cont_rest_tur, 10);
+                if (isNaN(this.cont_rest_tur)) {
+                  // console.error('Error converting cont_rest_tur to integer');
+                }
+              }
+              // console.log("nro_max_turnos - VERIFCANDO22", this.nro_max_turnos);  
+              // console.log("cont_rest_tur - VERIFCANDO22", this.cont_rest_tur);
+              // console.log('flag_variable_turnos_paso - flag_variable_turnos_paso: '+this.flag_variable_turnos_paso);                                                               
+              if (this.cont_rest_tur >= this.nro_max_turnos) {
+                this.cont_rest_tur = this.cont_rest_tur;
+                // console.error("cont_rest_tur - cont_rest_tur 1", this.cont_rest_tur);
+                this.flag_color_rojo_turno = true;
+
+              } else {
+                this.flag_color_rojo_turno = false;
+                this.getHourxTurno(this.inputFechaExamen);
+
+              }
+              if (this.nro_max_turnos > this.flag_variable_turnos_paso + 1) {
+                // console.log('Entroo nro maximoturnos  : '+this.nro_max_turnos);                                                     
+
+                this.flag_color_rojo_turno = true;
+              }
+            });
           }
-        });
-    
+        } else {
+          console.warn("No hay resultados de feriados: ");
+        }
+      });
+
   }
 
 
@@ -1946,13 +2014,13 @@ metodoTransformarDate (fecha):string{
 
 
 
-  getHourxTurno(fec_tur){
-    this.queryservice.getTurnosbyDate(fec_tur,1).then((result: any) => {
+  getHourxTurno(fec_tur) {
+    this.queryservice.getTurnosbyDate(fec_tur, 1).then((result: any) => {
       // console.log('Resultados de get Hour x Turno',result);
-      if(result){
-        this.list_tunos_hora_ocupados=result.data.getTurnosbyDate;               
-      }else{
-        this.list_tunos_hora_ocupados=null;
+      if (result) {
+        this.list_tunos_hora_ocupados = result.data.getTurnosbyDate;
+      } else {
+        this.list_tunos_hora_ocupados = null;
       }
       // console.log('this.list_tunos_hora_ocupados estar ___+_)(*&',this.list_tunos_hora_ocupados);
     });
@@ -1983,12 +2051,12 @@ metodoTransformarDate (fecha):string{
     }
 
   }
-/*
-  formatDate(data) {
-    this.inputFechaExamen = data;
-    this.checkTurno()
-  }
-  */
+  /*
+    formatDate(data) {
+      this.inputFechaExamen = data;
+      this.checkTurno()
+    }
+    */
 
   updatePaciente() {
     this.queryservice.insertPacientelite(JSON.stringify(this.paciente)).then((result: any) => {
@@ -2001,38 +2069,38 @@ metodoTransformarDate (fecha):string{
 
   getRefList() {
     this.list_ref.push({ value: null, des: "Ninguno" })
-/*
-    this.queryservice.getCsParms({ cs_name: "AVAREL" }).then((r: any) => {
-      let data = r.data.getCsParms;
-      console.log("r avarel",r);
-      if(data==null){
-        return
-      }
-      if (data.cod_parm && data.cod_parm != null) {
-        let list = data.data_parm.split("/");
-        list.forEach(element => {
-          if (element.length > 0) {
-            this.list_ref.push({ value: element, des: element })
+    /*
+        this.queryservice.getCsParms({ cs_name: "AVAREL" }).then((r: any) => {
+          let data = r.data.getCsParms;
+          console.log("r avarel",r);
+          if(data==null){
+            return
           }
-        });
-      }
-    }, error => {
-        console.error("este es el error", error)
-    })
-    */
+          if (data.cod_parm && data.cod_parm != null) {
+            let list = data.data_parm.split("/");
+            list.forEach(element => {
+              if (element.length > 0) {
+                this.list_ref.push({ value: element, des: element })
+              }
+            });
+          }
+        }, error => {
+            console.error("este es el error", error)
+        })
+        */
   }
 
- async getMaxTurnos() {    
-  await this.queryservice.getCsParms({ cs_name: "AVATXD" }).then((r: any) => {
+  async getMaxTurnos() {
+    await this.queryservice.getCsParms({ cs_name: "AVATXD" }).then((r: any) => {
       let data = r.data.getCsParms;
       // console.log('dataaaas: ',data);
-      if(data==null){
+      if (data == null) {
         return
       }
       if (data.cod_parm && data.cod_parm != null) {
-        
+
         this.nro_max_turnos = data.data_parm;
-        this.flag_variable_turnos_paso=data.data_parm;
+        this.flag_variable_turnos_paso = data.data_parm;
         // console.log('Entro al dataParam: ', this.nro_max_turnos);
 
       } else {
@@ -2069,7 +2137,7 @@ metodoTransformarDate (fecha):string{
     }
     this.getMaxTurnost()
     // console.log('this.temp_max_turnos',this.temp_max_turnos);
-    
+
     this.nro_turnos_pedidos_fechat = 0;
     //cuento los pedidos realizados en la fecha 
     this.queryservice.countPedidosbyFecha({ fecha: this.inputFechaExament, }).then((result: any) => {
@@ -2111,25 +2179,24 @@ metodoTransformarDate (fecha):string{
       this.checkTurnod()
       return
     }
-// console.log("entre check temp avaliable");
-// console.log("this.nro_turnos_pedidos_fechat",this.nro_turnos_pedidos_fechat);
-// console.log("this.temp_max_turnos",this.temp_max_turnos);
+    // console.log("entre check temp avaliable");
+    // console.log("this.nro_turnos_pedidos_fechat",this.nro_turnos_pedidos_fechat);
+    // console.log("this.temp_max_turnos",this.temp_max_turnos);
 
     if (this.nro_turnos_pedidos_fechat < this.temp_max_turnos) {
       if (this.list_fechas_disponibles.length >= 5) {
         // console.log("entre en mayor q 5", this.list_fechas_disponibles);
-        
         return
       }
-      else{
+      else {
         // console.log("entre en menor  q 5", this.list_fechas_disponibles);
         this.list_fechas_disponibles.push({ fecha: d2, inputFechaExamen: f1, selected: false })
-        
+
       }
-      
+
     }
     this.checkTurnod()
-   
+
   }
 
   changeFechaManual(data) {
@@ -2160,7 +2227,7 @@ metodoTransformarDate (fecha):string{
 
     // console.log('precios plan todo');
     // console.log('this.ListaAnalisis',this.ListaAnalisis);
-    
+
     for (let index = 0; index < this.ListaAnalisis.length; index++) {
       const element = this.ListaAnalisis[index];
       // console.log("element preciooos", element);
@@ -2227,47 +2294,47 @@ metodoTransformarDate (fecha):string{
     let pospago: number = 0.00
     let subtotal: number = 0.00
     let flag_aumento: boolean = false;
-/*
-    if (this.ListaAnalisis.length > 0) {
-      for (let i = 0; i < this.ListaAnalisis.length; i++) {
-        console.log('this.listAnalisis[i]', this.ListaAnalisis[i]);
-
-
-
-        if (this.ListaAnalisis[i].aumento) {
-          flag_aumento = true;
-          // this.listAnalisis.dcto_val=this.dataOrden.dcto_val
-          if (this.dataOrden.dcto_val == 0) {
-            this.ListaAnalisis[i].dcto_val = this.dataOrden.dcto_val;
-            this.ListaAnalisis[i].aumento = false;
-          } else {
-            this.ListaAnalisis[i].dcto_val = this.dataOrden.dcto_val;
+    /*
+        if (this.ListaAnalisis.length > 0) {
+          for (let i = 0; i < this.ListaAnalisis.length; i++) {
+            console.log('this.listAnalisis[i]', this.ListaAnalisis[i]);
+    
+    
+    
+            if (this.ListaAnalisis[i].aumento) {
+              flag_aumento = true;
+              // this.listAnalisis.dcto_val=this.dataOrden.dcto_val
+              if (this.dataOrden.dcto_val == 0) {
+                this.ListaAnalisis[i].dcto_val = this.dataOrden.dcto_val;
+                this.ListaAnalisis[i].aumento = false;
+              } else {
+                this.ListaAnalisis[i].dcto_val = this.dataOrden.dcto_val;
+              }
+            }
+    
           }
+    
+          if (!flag_aumento && this.dataOrden.dcto_val != 0) {
+            this.ListaAnalisis[this.ListaAnalisis.length - 1].dcto_val = this.dataOrden.dcto_val;
+            this.ListaAnalisis[this.ListaAnalisis.length - 1].aumento = true;
+          }
+    
         }
-
-      }
-
-      if (!flag_aumento && this.dataOrden.dcto_val != 0) {
-        this.ListaAnalisis[this.ListaAnalisis.length - 1].dcto_val = this.dataOrden.dcto_val;
-        this.ListaAnalisis[this.ListaAnalisis.length - 1].aumento = true;
-      }
-
-    }
-    */
+        */
     this.ListaAnalisis.forEach((element, index) => {
-     // element.dcto_pet = this.dataOrden.dcto_ord;
+      // element.dcto_pet = this.dataOrden.dcto_ord;
       subtotal = subtotal + parseFloat(element.subtotal);
 
 
 
-/*
-      if (this.dataOrden.dcto_ord != 0) {
-
-        let totalTemp = (((element.subtotal * element.dcto_pet) / 100) + parseFloat(element.subtotal) + element.dcto_val);
-        element.totalPac = this.helperservice.toFixed(totalTemp, 2);
-
-      }
-      */
+      /*
+            if (this.dataOrden.dcto_ord != 0) {
+      
+              let totalTemp = (((element.subtotal * element.dcto_pet) / 100) + parseFloat(element.subtotal) + element.dcto_val);
+              element.totalPac = this.helperservice.toFixed(totalTemp, 2);
+      
+            }
+            */
       total = total + parseFloat(element.totalPac);
       pospago = pospago + parseFloat(element.pospago);
 
@@ -2276,9 +2343,9 @@ metodoTransformarDate (fecha):string{
     this.precioFinal = { total: total, pospago: pospago, subtotal: subtotal }
 
 
-    
-    this.dataOrden.pre_ord =Math.ceil(subtotal) ;
-    this.dataOrden.val_ord =Math.ceil(total) ;
+
+    this.dataOrden.pre_ord = Math.ceil(subtotal);
+    this.dataOrden.val_ord = Math.ceil(total);
     this.total_ord = Math.ceil(total).toFixed(2);
 
   }
@@ -2289,17 +2356,17 @@ metodoTransformarDate (fecha):string{
 
   ////Andy metodos verificar 
   //Metodo de escoger Radio Buttom
-  Escoger_Radio_Button_dia(fecha,variable){  
-    this.elegir_variable=variable;
-    console.warn("en varibale "+this.elegir_variable);
+  Escoger_Radio_Button_dia(fecha, variable) {
+    this.elegir_variable = variable;
+    console.warn("en varibale " + this.elegir_variable);
 
-    this.checkTurno_avdg(this.lugar,fecha,this.elegir_variable);
-    this.opcion_fecha_turnos_eme='';
+    this.checkTurno_avdg(this.lugar, fecha, this.elegir_variable);
+    this.opcion_fecha_turnos_eme = '';
     // console.warn("Lugarrrrrrr",this.lugar);
     // console.warn("Entro en escoger radio buttom fecha escogida: "+fecha);
 
   }
-///Limpiando Datos Totalmente
+  ///Limpiando Datos Totalmente
 
   //Metodo de validaciones ::
   validateOnlyNumbers(event: any) {
@@ -2320,7 +2387,7 @@ metodoTransformarDate (fecha):string{
       this.bandera_icono_search = false;
       this.cedula_paciente = '';
       this.placeholderNombre = "Buscar ..."
-      this.placeholderCedula= "Buscar..."
+      this.placeholderCedula = "Buscar..."
 
     }
     if (datos === 'cedula') {
@@ -2331,7 +2398,7 @@ metodoTransformarDate (fecha):string{
       this.bandera_icono_search = true;
       this.nombre_paciente = '';
       this.placeholderCedula = "Buscar..."
-      this.placeholderNombre= "Buscar..."
+      this.placeholderNombre = "Buscar..."
     }
     if (datos === 'reset') {
       this.size_nombre = 6;
@@ -2343,84 +2410,84 @@ metodoTransformarDate (fecha):string{
 
 
 
-///Variables para el cambio de tamaño de de los input de nombre y cedula
-size_nombre = 8;
-size_cedula = 4;
-size_reset_total = 2;
-size_nombre_tablet = 6;
-size_cedula_tablet = 6;
+  ///Variables para el cambio de tamaño de de los input de nombre y cedula
+  size_nombre = 8;
+  size_cedula = 4;
+  size_reset_total = 2;
+  size_nombre_tablet = 6;
+  size_cedula_tablet = 6;
 
-///Buscar Paciente
-async buscarPaciente() {
-  // console.log("Entro en buscar paciente ahora mismo: ");
-  // let comparacion = '';
-  // let porcentaje = '%';
-  // let nombre_paciente_enviar_base;
-  // this.choosedUser = false
-  // this.nombre_paciente = this.nombre_paciente.toLowerCase();
-  // nombre_paciente_enviar_base = this.nombre_paciente.replace(/ /g, porcentaje);
-  // if (this.cedula_paciente == '' && nombre_paciente_enviar_base == '') {
-  //   this.resultadosFiltrados.length = 0;
-  //   this.foundpacient = false
-  //   this.toastservice.presentToast({ message: "Ingrese al menos un campo de busqueda", position: "top", color: "warning", duration: 1500 })
-  //   return
-  // }
-  // this.lista_resultados_pacientes = [];
-  // if (this.cedula_paciente.length >= 10 || nombre_paciente_enviar_base.length) {
-  //   this.loadingservice.presentLoading("Buscando paciente....")
-  //   this.queryservice.SearchPacienteDynamic(
-  //     { cedula: this.cedula_paciente, codigo: this.codigo_paciente, nombre: this.nombre_paciente, apellido: this.apellido_paciente, nombre_completo: nombre_paciente_enviar_base }
-  //   ).then((r: any) => {
-  //     let data = r.data.searchPacienteDynamic
-  //     if (data.length > 0 && nombre_paciente_enviar_base.length) {
-  //       this.lista_resultados_pacientes = data;
-  //       this.loaded = false;
-  //       this.resultadosFiltrados = this.lista_resultados_pacientes;
-  //       this.loaded = true;
-  //       this.flag_show_listado = false;
-  //       this.filtrarResultados();
-  //       this.foundpacient = true
-  //       this.loadingservice.dismiss()
-  //     } else if (data.length > 0 && this.cedula_paciente.length) {
-  //       this.lista_resultados_pacientes = data;
-  //       this.loaded = false;
-  //       this.resultadosFiltrados = this.lista_resultados_pacientes;
-  //       this.loaded = true;
-  //       this.flag_show_listado = false;
-  //       this.filterByIdPac()
-  //       this.loadingservice.dismiss()
-  //       this.foundpacient = true
+  ///Buscar Paciente
+  async buscarPaciente() {
+    // console.log("Entro en buscar paciente ahora mismo: ");
+    // let comparacion = '';
+    // let porcentaje = '%';
+    // let nombre_paciente_enviar_base;
+    // this.choosedUser = false
+    // this.nombre_paciente = this.nombre_paciente.toLowerCase();
+    // nombre_paciente_enviar_base = this.nombre_paciente.replace(/ /g, porcentaje);
+    // if (this.cedula_paciente == '' && nombre_paciente_enviar_base == '') {
+    //   this.resultadosFiltrados.length = 0;
+    //   this.foundpacient = false
+    //   this.toastservice.presentToast({ message: "Ingrese al menos un campo de busqueda", position: "top", color: "warning", duration: 1500 })
+    //   return
+    // }
+    // this.lista_resultados_pacientes = [];
+    // if (this.cedula_paciente.length >= 10 || nombre_paciente_enviar_base.length) {
+    //   this.loadingservice.presentLoading("Buscando paciente....")
+    //   this.queryservice.SearchPacienteDynamic(
+    //     { cedula: this.cedula_paciente, codigo: this.codigo_paciente, nombre: this.nombre_paciente, apellido: this.apellido_paciente, nombre_completo: nombre_paciente_enviar_base }
+    //   ).then((r: any) => {
+    //     let data = r.data.searchPacienteDynamic
+    //     if (data.length > 0 && nombre_paciente_enviar_base.length) {
+    //       this.lista_resultados_pacientes = data;
+    //       this.loaded = false;
+    //       this.resultadosFiltrados = this.lista_resultados_pacientes;
+    //       this.loaded = true;
+    //       this.flag_show_listado = false;
+    //       this.filtrarResultados();
+    //       this.foundpacient = true
+    //       this.loadingservice.dismiss()
+    //     } else if (data.length > 0 && this.cedula_paciente.length) {
+    //       this.lista_resultados_pacientes = data;
+    //       this.loaded = false;
+    //       this.resultadosFiltrados = this.lista_resultados_pacientes;
+    //       this.loaded = true;
+    //       this.flag_show_listado = false;
+    //       this.filterByIdPac()
+    //       this.loadingservice.dismiss()
+    //       this.foundpacient = true
 
-  //     } else {
-  //       this.resultadosFiltrados.length = 0;
-  //       this.toastservice.presentToast({ message: "No se encuentran resultados", position: "middle", color: "warning", duration: 1500 });
-  //       this.loadingservice.dismiss()
-  //       this.foundpacient = false
-  //     }
-  //   });
+    //     } else {
+    //       this.resultadosFiltrados.length = 0;
+    //       this.toastservice.presentToast({ message: "No se encuentran resultados", position: "middle", color: "warning", duration: 1500 });
+    //       this.loadingservice.dismiss()
+    //       this.foundpacient = false
+    //     }
+    //   });
 
-  // }
+    // }
 
-}
-
-////Segment para escoger entre la busqueda de Cedulas o Nombres
-segmentChanged(event) {
-  this.selectedSegment = event.detail.value;
-  if (this.selectedSegment === 'cedula') {
-    this.LimpiarTodo();
   }
-}
 
-abrirModalGetPaciente() {  
-  this.LimpiarTodo();
-  this.get_Modal_Paciente();
-}
+  ////Segment para escoger entre la busqueda de Cedulas o Nombres
+  segmentChanged(event) {
+    this.selectedSegment = event.detail.value;
+    if (this.selectedSegment === 'cedula') {
+      this.LimpiarTodo();
+    }
+  }
+
+  abrirModalGetPaciente() {
+    this.LimpiarTodo();
+    this.get_Modal_Paciente();
+  }
 
 
 
-//Metodo llamada de busqueda de pacientes ::
-async get_Modal_Paciente() {
-      const modal = await this.modalcontroller.create({
+  //Metodo llamada de busqueda de pacientes ::
+  async get_Modal_Paciente() {
+    const modal = await this.modalcontroller.create({
       component: SearchPacientePage,
       // componentProps: { value: 123 },
       backdropDismiss: false
@@ -2432,10 +2499,10 @@ async get_Modal_Paciente() {
       this.inputCedula = paciente.id_pac;
       // console.log("Entro al if de this.inputCedula: ",this.inputCedula)
 
-      if(!this.inputCedula){
+      if (!this.inputCedula) {
         // console.log("Entro al if de paciente: ",paciente)
         this.getPacienteByCod(paciente.cod_pac);
-      }else{
+      } else {
         this.getPaciente();
       }
     }
@@ -2443,20 +2510,20 @@ async get_Modal_Paciente() {
 
   segmentChanged1(event) {
     switch (event.detail.value) {
-        case 'profiles':
-            this.presentModalPerfiles();
-            break;
-        case 'profilesGeneral':
-            this.presentModalPerfilesAva();
-            break;
-    
-}
-}
+      case 'profiles':
+        this.presentModalPerfiles();
+        break;
+      case 'profilesGeneral':
+        this.presentModalPerfilesAva();
+        break;
 
-getRowColor(index: number): string {
+    }
+  }
 
-  return index % 2 === 0 ? 'even-row' : 'odd-row';
-}
+  getRowColor(index: number): string {
+
+    return index % 2 === 0 ? 'even-row' : 'odd-row';
+  }
 
 
 

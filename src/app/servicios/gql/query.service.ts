@@ -552,15 +552,34 @@ getTurnosbyUidd(uuid) {
   return result;
 }
 
+//////////////////////////////
+//////////////////////////////
+insertPedAnaxTur(json_datos,json_ana) {
+  let gqldata = gql`
+mutation insertPedAnaxTur(
+    $json_datos:String!,
+    $json_ana:String!
+   ) {
+    insertPedAnaxTur(
+      json_datos:$json_datos,
+      json_ana:$json_ana
+ ) {
+    mensaje
+    resultado
+    data
+  }
+}`;
+  let result =
+    this.apollo.use('api_avalab').mutate({
+      mutation: gqldata,
+      variables: {
+        json_datos: json_datos,
+        json_ana:json_ana
+      }
+    }).toPromise();
 
-
-
-
-
-
-
-
-
+  return result;
+}
 
 //////////////////////////////
   insertPacienteComplete(data) {

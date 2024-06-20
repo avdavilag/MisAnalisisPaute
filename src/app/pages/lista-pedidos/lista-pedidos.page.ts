@@ -102,9 +102,16 @@ export class ListaPedidosPage implements OnInit {
       }
     };
     this.getData('intra',false);
-    this.colores_grid=["#D6FFFA", "#FFFFEF", "#EAD6FF"]
-  
+    this.colores_grid=["#D6FFFA", "#FFFFEF", "#EAD6FF"]     
     
+    
+    const navigation = this.router.getCurrentNavigation();
+if (navigation && navigation.extras && navigation.extras.state) {
+  const state = navigation.extras.state as {lista_pedidos: any};
+  if (state.lista_pedidos !== null) {
+    console.log('Revisa por favor - lista_pedidos',state.lista_pedidos);
+  }
+}
   }
 
   ionViewWillEnter() {
