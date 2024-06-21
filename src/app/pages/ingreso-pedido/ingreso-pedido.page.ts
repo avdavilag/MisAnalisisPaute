@@ -29,6 +29,7 @@ import { BusquedaPacientesPage } from '../busqueda-pacientes/busqueda-pacientes.
 import { SearchMedicoPage } from 'src/app/modals/orden/search-medico/search-medico.page';
 import { SearchPacientePage } from 'src/app/modals/orden/search-paciente/search-paciente.page';
 import { ListaPedidosPage } from '../lista-pedidos/lista-pedidos.page';
+import { get } from 'http';
 
 
 @Component({
@@ -112,6 +113,7 @@ export class IngresoPedidoPage implements OnInit {
   desactivar_segment_nombre_cedula: boolean = false;
   variable_activar_fecha = false;
   turno_hora_pedido: string;
+  vector_analisis_creacion_view: any = [];
 
   paciente = {
     cod_pac: null,
@@ -1336,9 +1338,82 @@ export class IngresoPedidoPage implements OnInit {
 
   flag_pass_repeat_analisis: boolean = false;
 
+
+
+  async ViewAnalisisByPedidoTur(cod_pac, fecha_inicial, fecha_final, data) {
+    let cod_ana_data = data.cod_ana;
+    this.vector_analisis_creacion_view = [];
+    let vector_pedidos = [];
+    // this.queryservice.getTurnoByDateById(cod_pac,fecha_inicial,fecha_inicial).then((result: any) => { 
+      console.log("amtede del query");
+    this.queryservice.getTurnoByDateById(cod_pac, '2024/06/12 14:00', '2024/06/12 18:00').then((result: any) => {
+      console.log("resultado query");
+      vector_pedidos = result.data.getTurnoByDateById;
+
+      vector_pedidos.forEach((pedido) => {
+        pedido.Analisis.forEach((cod_ana) => {
+
+          console.log("Vector pedidos: ", vector_pedidos);
+            if (cod_ana.cod_ana == cod_ana_data) {
+              console.log("medico ssss : ", pedido.cod_med);
+            this.vector_analisis_creacion_view.push({"Cod_Analisis": cod_ana.cod_ana, "Nombre Analisis": cod_ana.des_ana });
+          }
+        });
+      });
+        if (this.vector_analisis_creacion_view.length > 0) {
+        this.presentAlertExistAna(this.vector_analisis_creacion_view);
+      }
+    });
+  }
+
+
+async presentAlertExistAna(vector_analisis_creacion_view) {
+  console.log('vector_analisis_creacion_view - vector_analisis_creacion_view: ', vector_analisis_creacion_view);
+  const alert = await this.alertController.create({
+    header: '! Información !',
+    message: 'Este Paciente ya tiene este Analisis Creado .',
+    buttons: ['Cerrar']
+  });
+
+  await alert.present();
+}
+
+
+formatDateConsultaDatos(dateObject: Date): string {
+  let year = dateObject.getFullYear();
+  let month = dateObject.getMonth() + 1; // Los meses en JavaScript van de 0 a 11, por lo que debes sumar 1
+  let day = dateObject.getDate();
+  let hours = dateObject.getHours();
+  let minutes = dateObject.getMinutes();
+
+  // Asegurándose de que el mes, el día, las horas y los minutos tengan dos dígitos
+  let formattedMonth = month < 10 ? '0' + month : month.toString();
+  let formattedDay = day < 10 ? '0' + day : day.toString();
+  let formattedHours = hours < 10 ? '0' + hours : hours.toString();
+  let formattedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
+
+  return `${year}/${formattedMonth}/${formattedDay} ${formattedHours}:${formattedMinutes}`;
+}
+
   addAnalisis(data) {
-    console.log('data addAnalisis: ', data)
+    let date_hoy= new Date();
+    console.log('date_hoy - Hoy en Dia: ', date_hoy);
+    if(this.pedido_duplicar != undefined && this.pedido_duplicar != '' && this.pedido_duplicar != null){      
+      console.log('Paciente UNDEFINIDO ');
+    }else{
+      console.log('Paciente id_nombre - cod_pac: ', this.paciente.cod_pac);
+      let dateObject = new Date(date_hoy);
+      let fecha_inicial = this.formatDateConsultaDatos(dateObject);
+      let dateObjectModified = new Date(dateObject.getTime());
+      dateObjectModified.setHours(dateObjectModified.getHours() - 8);
+      let fecha_final = this.formatDateConsultaDatos(dateObjectModified);
+      // console.error('dateObjectModified - dateObjectModified de fecha_formato_modificada: ',fecha_inicial);
+      // console.error('fecha_formato - fecha_formato de fecha_formato_modificada: ',fecha_final);
+     this.ViewAnalisisByPedidoTur(this.paciente.cod_pac,fecha_inicial,fecha_final,data);
+    }
     
+    
+  
 
     let data_temp = []
     if (this.list_peticionesxorden.length > 0) {
@@ -1418,7 +1493,7 @@ export class IngresoPedidoPage implements OnInit {
     return data;
   }
 
-  asu
+  
 
 
   async presentAlertUpdate() {

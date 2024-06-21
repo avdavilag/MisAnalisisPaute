@@ -1139,6 +1139,43 @@ query  getMedicobyCed($id_med:String!){
 
     return result;
   }
+///////ViewAnalisisByPedidoTur-getTurnoByDateById///////////////////////////////////////
+getTurnoByDateById(cod_pac,fec_ini_inicial,fec_ini_final) {
+  let getTurnoByDateById = gql`
+query getTurnoByDateById($cod_pac:String!,$fec_ini_inicial:String!,$fec_ini_final:String!){
+  getTurnoByDateById(cod_pac:$cod_pac,fec_ini_inicial:$fec_ini_inicial,fec_ini_final:$fec_ini_final){
+    id_pedidos,
+    cod_pac,
+    cod_med,
+    Analisis{
+      id_analisisxpedidos,
+      cod_ana,
+      des_ana,
+    }
+  }
+}
+`;
+  let result = this.apollo.use('api_avalab').query({
+    query: getTurnoByDateById,
+    variables: {
+      cod_pac:cod_pac,
+      fec_ini_inicial:fec_ini_inicial,
+      fec_ini_final: fec_ini_final
+    }
+  }).toPromise();
+  return result
+}
+///////ViewAnalisisByPedidoTur-getTurnoByDateById///////////////////////////////////////
+///////FIN///////////////////////////////////////
+
+
+
+
+
+
+
+
+
 
   SearchAnalisxMstrs2(analisisbuscar) {
     let gqlSearchAnalisxMstrs = gql`
@@ -1155,7 +1192,6 @@ query  getMedicobyCed($id_med:String!){
     }
   }
   `;
-
     let result = this.apollo.use('api_avalab').query({
       query: gqlSearchAnalisxMstrs,
       variables: {
