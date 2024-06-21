@@ -9,6 +9,9 @@ import { HomeMedicoPageRoutingModule } from './home-medico-routing.module';
 import { HomeMedicoPage } from './home-medico.page';
 import { TranslateModule } from '@ngx-translate/core';
 
+
+
+
 @NgModule({
   imports: [
     CommonModule,

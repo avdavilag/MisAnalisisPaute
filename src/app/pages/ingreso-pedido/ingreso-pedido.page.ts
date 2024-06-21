@@ -1338,6 +1338,8 @@ export class IngresoPedidoPage implements OnInit {
 
   addAnalisis(data) {
     console.log('data addAnalisis: ', data)
+    
+
     let data_temp = []
     if (this.list_peticionesxorden.length > 0) {
       data_temp = this.list_peticionesxorden.filter(peticion => peticion == data.cod_ana)
@@ -1483,22 +1485,8 @@ export class IngresoPedidoPage implements OnInit {
 
   async presentViewUpdatePedido(lista_pedidos) {
 console.log("pedidos -+----: ", lista_pedidos);
-
-
-this.router.navigate(['/lista-pedidos'], { state: { lista_pedidos: lista_pedidos } });
-
-// this.navCtrl.navigateForward('/lista-pedidos');
-
-      //     const modal = await this.modalcontroller.create({
-      //   component: ListaPedidosPage,
-      //   componentProps: {
-      //     'lista_pedidos': lista_pedidos
-      //   }
-      // });
-      // await modal.present();
-      // modal.onDidDismiss().then((result: any) => {
-      // })
-  }
+this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: lista_pedidos } });
+}
 
   async presentAlertGuardar() {
     if (this.paciente.id_pac == null) {

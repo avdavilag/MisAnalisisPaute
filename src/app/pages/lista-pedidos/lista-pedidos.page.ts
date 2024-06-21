@@ -31,7 +31,7 @@ export class ListaPedidosPage implements OnInit {
 
   public lista_pedidos;
   public mobile = false;
-  public digitosBusqueda:String = "";
+  public digitosBusqueda: String = "";
   public lista_filtrar;
   public lista_temporal;
   public criterio_ordenamiento = "D";
@@ -41,24 +41,26 @@ export class ListaPedidosPage implements OnInit {
   public filtro = false;
   public tooltip_btn = "";
   public tipo_server = 0;
-  public flag_filtro_intra_med:any=false;
-  colores_grid=[];
-  public fecha_comparar=new Date();
+  public flag_filtro_intra_med: any = false;
+  colores_grid = [];
+  public fecha_comparar = new Date();
+  public flag_pintar_item = false;
+  public pedido_update=null;
 
   f_desde;
   f_hasta;
-  public dato_find:String="";
-  infoText="";
+  public dato_find: String = "";
+  infoText = "";
 
-  des_usr:any=""
+  des_usr: any = ""
 
-  qr_link="";
+  qr_link = "";
 
   constructor(
     private serviciosBase: BaseService,
     public modalCtrl: ModalController,
     private varGlobal: VariablesGlobalesService,
-    private serviciosPDF:PdfRenderService,
+    private serviciosPDF: PdfRenderService,
     public popoverController: PopoverController,
     public loadingController: LoadingController,
     public alertController: AlertController,
@@ -68,7 +70,7 @@ export class ListaPedidosPage implements OnInit {
     private router: Router,
     private _translate: TranslateService,
     private queryservice: QueryService,
-    private toastservice:ToastService) {
+    private toastservice: ToastService) {
 
 
     this.var_usr = {};
@@ -80,15 +82,15 @@ export class ListaPedidosPage implements OnInit {
 
     this.des_usr = this.varGlobal.getVarUsuarioDes();
 
-    
 
+
+    this.pedido_update=null;
 
 
   }
 
   ngOnInit() {
-   
-
+    
     if (window.screen.width < 600 || window.innerWidth < 600) { // 768px portrait        
       this.mobile = true;
     } else {
@@ -101,53 +103,60 @@ export class ListaPedidosPage implements OnInit {
         this.mobile = false;
       }
     };
-    this.getData('intra',false);
-    this.colores_grid=["#D6FFFA", "#FFFFEF", "#EAD6FF"]     
-    
-    
+    this.getData('intra', false);
+    this.colores_grid = ["#D6FFFA", "#FFFFEF", "#EAD6FF"]
+
+
     const navigation = this.router.getCurrentNavigation();
-if (navigation && navigation.extras && navigation.extras.state) {
-  const state = navigation.extras.state as {lista_pedidos: any};
-  if (state.lista_pedidos !== null) {
-    console.log('Revisa por favor - lista_pedidos',state.lista_pedidos);
-  }
-}
+    if (navigation && navigation.extras && navigation.extras.state) {
+      const state = navigation.extras.state as { lista_pedidos: any };
+      if (state.lista_pedidos !== null) {
+        console.log('Revisa por favor - lista_pedidos', state.lista_pedidos);
+        this.flag_pintar_item = true;
+        this.pedido_update=state.lista_pedidos.id_pedidos;
+       }
+     } else {
+      this.flag_pintar_item = false;
+      this.pedido_update=null;
+    }
+    console.log('Revisa por favor - flag_pintar_item', this.flag_pintar_item);
+    console.log('pedido_update * pedido_update', this.pedido_update);
+    
   }
 
   ionViewWillEnter() {
- 
     this.lista_pedidos = [];
     this.lista_filtrar = [];
     this.lista_temporal = [];
 
-    let fecha_hoy=new Date;
-    let dias=5;
-    this.f_hasta=fecha_hoy.toISOString().split("T")[0];
-    this.f_desde= new Date(fecha_hoy.setDate(fecha_hoy.getDate() - dias)).toISOString().split("T")[0]
+    let fecha_hoy = new Date;
+    let dias = 5;
+    this.f_hasta = fecha_hoy.toISOString().split("T")[0];
+    this.f_desde = new Date(fecha_hoy.setDate(fecha_hoy.getDate() - dias)).toISOString().split("T")[0]
     this.presentLoading();
     this.usuario = this.varGlobal.getEntidad();
     this.var_usr = this.varGlobal.getVarUsuario();
 
-    this.qr_link=this.configApp.redirectWeb;
+    this.qr_link = this.configApp.redirectWeb;
     //tipo de servidor
     this.tipo_server = this.configApp.apiBaseType;
     //DEFAULT PAGINACION
     this.paginacion = this.configApp.defaultPaginacion;
-  //  console.log("usuario", this.usuario);
-  
+    //  console.log("usuario", this.usuario);
+
     setTimeout(() => {
-    
-      this.getData('intra',this.flag_filtro_intra_med);
+
+      this.getData('intra', this.flag_filtro_intra_med);
     }, 100);
 
   }
 
 
-  getColor(indice){    
-      return this.colores_grid[indice%this.colores_grid.length]
-    }
+  getColor(indice) {
+    return this.colores_grid[indice % this.colores_grid.length]
+  }
 
-  getData(tipo?,flag_filtro_intra_med?) {
+  getData(tipo?, flag_filtro_intra_med?) {
     //this.dataOrden.cod_med = this.varGlobal.getVarUsuario()
     //this.presentLoading();
     this.lista_pedidos = [];
@@ -155,38 +164,38 @@ if (navigation && navigation.extras && navigation.extras.state) {
     this.lista_temporal = [];
     this.infoText = "Cargando...";
 
-    this.flag_filtro_intra_med=flag_filtro_intra_med;
-    console.error('Flag this.flag_filtro_intra_med 11: ',this.flag_filtro_intra_med);
+    this.flag_filtro_intra_med = flag_filtro_intra_med;
+    console.error('Flag this.flag_filtro_intra_med 11: ', this.flag_filtro_intra_med);
 
     //console.error('Tipo de tipos: ',this.varGlobal.getVarUsuarioTipo());
-    
+
     // let data={codigo:this.varGlobal.getVarUsuario(), desde:this.f_desde,hasta:this.f_hasta+ " 24:00" ,dato:this.dato_find,tipo:this.varGlobal.getVarUsuarioTipo(),orderby:"ASC"}
-    let data={codigo:this.varGlobal.getVarUsuario(), desde:this.f_desde,hasta:this.f_hasta+ " 24:00" ,dato:this.dato_find,tipo:tipo,orderby:"ASC"}
-   console.log('data - FILTER: ',JSON.stringify({filter:data}));
-   
-    this.queryservice.getPedidosbyTipo({json_data:JSON.stringify({filter:data})}).then(async (result: any) => {
+    let data = { codigo: this.varGlobal.getVarUsuario(), desde: this.f_desde, hasta: this.f_hasta + " 24:00", dato: this.dato_find, tipo: tipo, orderby: "ASC" }
+    console.log('data - FILTER: ', JSON.stringify({ filter: data }));
+
+    this.queryservice.getPedidosbyTipo({ json_data: JSON.stringify({ filter: data }) }).then(async (result: any) => {
       console.log('resultpedido', result);
-      
-      if(result&&result.data){
+
+      if (result && result.data) {
         this.lista_pedidos = result.data.ListPedidosbyTipo
-        ;
-        console.log('resultdata',this.lista_pedidos);
-       
-     //   console.log(this.lista_pedidos);
+          ;
+        console.log('resultdata', this.lista_pedidos);
+
+        //   console.log(this.lista_pedidos);
         //para filtrar
-        this.lista_filtrar=result.data.ListPedidosbyTipo  
+        this.lista_filtrar = result.data.ListPedidosbyTipo
         this.lista_filtrar = this.lista_filtrar.slice(0, this.paginacion);
-        console.log('this.lista_filtrar: ',this.lista_filtrar);
-      }else{
-        if(result.errors&&result.errors.length>0){
+        console.log('this.lista_filtrar: ', this.lista_filtrar);
+      } else {
+        if (result.errors && result.errors.length > 0) {
           this.utilidades.mostrarToast(result.errors[0].message)
-        }else{
+        } else {
           this.utilidades.mostrarToast("OCURRIO UN PROBLEMA AL CARGAR PEDIDOS")
         }
       }
       this.infoText = ""
       setTimeout(async () => {
-        
+
         const isLoadingOpen = await this.loadingController.getTop();
         if (isLoadingOpen) {
           this.loadingController.dismiss()
@@ -213,23 +222,23 @@ if (navigation && navigation.extras && navigation.extras.state) {
   buscaxFiltro() {
 
 
-    
+
     if (this.dato_find.length > 3 || this.dato_find == '') {
-      console.log("Antes de Antes intra medico",this.flag_filtro_intra_med);
-      if(this.flag_filtro_intra_med===undefined && this.flag_filtro_intra_med==null){ 
+      console.log("Antes de Antes intra medico", this.flag_filtro_intra_med);
+      if (this.flag_filtro_intra_med === undefined && this.flag_filtro_intra_med == null) {
         console.log("Entro antes del filtro entrro` por primera vez");
-      this.flag_filtro_intra_med=false;
+        this.flag_filtro_intra_med = false;
       }
 
-      if(this.flag_filtro_intra_med){
-        this.getData('med',this.flag_filtro_intra_med);
-      }else{
-        this.getData('intra',this.flag_filtro_intra_med);
+      if (this.flag_filtro_intra_med) {
+        this.getData('med', this.flag_filtro_intra_med);
+      } else {
+        this.getData('intra', this.flag_filtro_intra_med);
       }
 
-      
+
     }
-    
+
   }
 
 
@@ -237,7 +246,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
     let fecha_hoy = new Date()
     let dias = 7
     let espera = 100
-    
+
     if (this.f_desde == '') {
       espera = 150;
       setTimeout(() => {
@@ -251,7 +260,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
       }, 100);
     }
     setTimeout(() => {
-      
+
       this.getData()
     }, espera);
 
@@ -264,10 +273,10 @@ if (navigation && navigation.extras && navigation.extras.state) {
     this.infiniteScroll.disabled
     this.lista_filtrar = this.lista_pedidos.filter((item) => {
       return item.fec_ord.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
-      item.Paciente.nom_pac.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
-      item.Paciente.ape_pac.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
-      item.Paciente.nombre_completo.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
-      item.Paciente.id_pac.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
+        item.Paciente.nom_pac.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
+        item.Paciente.ape_pac.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
+        item.Paciente.nombre_completo.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
+        item.Paciente.id_pac.toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1 ||
         item.id_pedidos.toString().toLowerCase().indexOf(this.digitosBusqueda.toLowerCase()) > -1
         ;
     });
@@ -286,7 +295,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
     });
     popover.onDidDismiss()
       .then((data) => {
-         console.log(data['data']);
+        console.log(data['data']);
         this.filtrarPeriodo(data['data']);
 
       });
@@ -302,7 +311,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
       translucent: true,
       componentProps: {
         criterio: this.criterio_ordenamiento,
-        tipo:'pedido'
+        tipo: 'pedido'
       }
     });
     popover.onDidDismiss()
@@ -357,8 +366,8 @@ if (navigation && navigation.extras && navigation.extras.state) {
       this.presentLoading()
       this.lista_pedidos = await this.getDataSynchronous();
       this.loadingController.dismiss()
-      this.lista_pedidos=this.lista_pedidos.data.ListPedidosbyMed
-      
+      this.lista_pedidos = this.lista_pedidos.data.ListPedidosbyMed
+
       console.log(this.lista_pedidos);
       //filtro
       this.lista_filtrar = await this.lista_pedidos.filter((item) => {
@@ -380,7 +389,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
     if (periodo && periodo == -1) {
       //  console.log("ESTA AQUI");      
       this.lista_pedidos = await this.getDataSynchronous();
-      this.lista_pedidos=this.lista_pedidos.data.ListPedidosbyMed
+      this.lista_pedidos = this.lista_pedidos.data.ListPedidosbyMed
       this.infiniteScroll.disabled = false;
       this.lista_filtrar = this.lista_pedidos.slice(0, this.paginacion);
     }
@@ -411,7 +420,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
 
   async openModalQR(uuid) {
     //TOCA MODIFICAR EN CASO DE EXISTIR UN DOMINIO
-    let url=this.configApp.redirectWeb+"#/resultado-pedido?uid="+uuid
+    let url = this.configApp.redirectWeb + "#/resultado-pedido?uid=" + uuid
     const modal = await this.modalCtrl.create({
       component: VisorQrPage,
       componentProps: {
@@ -445,7 +454,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
     formData.append("tipo_usr", this.usuario.tipo);
     formData.append("cod", this.usuario.codigo);
     this.paginacion = this.configApp.defaultPaginacion;
-   return this.queryservice.getPedidosbyMed(this.varGlobal.getVarUsuario())
+    return this.queryservice.getPedidosbyMed(this.varGlobal.getVarUsuario())
   }
 
 
@@ -453,7 +462,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
     // console.log(event);
     console.log("cancelo");
     this.digitosBusqueda = "";
-     this.filterOrdenes();
+    this.filterOrdenes();
     this.filtro = false;
 
 
@@ -515,7 +524,7 @@ if (navigation && navigation.extras && navigation.extras.state) {
       "orden": orden
     }
     console.log(JSON.stringify(valores_enviar.orden));
-    
+
     console.log(valores_enviar);
     //ENVIO AL SERVICIO
     let respuesta;
@@ -543,8 +552,8 @@ if (navigation && navigation.extras && navigation.extras.state) {
         this.loadingController.dismiss();
       }, 500);
       console.error(error);
-     this.utilidades.mostrarToast("Problema datos " + error.status);
-   
+      this.utilidades.mostrarToast("Problema datos " + error.status);
+
     });
     //  window.open("https://resultados.gamma.com.ec:8443/gamma/webresources/eReport/pdf?orden=712418&paciente=227064&token=2048", "_blank")
 
@@ -576,64 +585,64 @@ if (navigation && navigation.extras && navigation.extras.state) {
     await alert.present();
   }
 
-  go_ingresar_duplicado(data){
+  go_ingresar_duplicado(data) {
     //console.log(data);
     this.varGlobal.setPedido_d(data);
     //sessionStorage.setItem('orden_duplicar',JSON.stringify(data));
-    this.router.navigateByUrl("/home-medico/ingreso-pedido",{replaceUrl:true})
+    this.router.navigateByUrl("/home-medico/ingreso-pedido", { replaceUrl: true })
   }
 
 
 
-  
-  Anular_Pedido(data){
-    console.log('data',data);          
-    this.serviciosBase.getAnularTurno({orden:{id_pedido:data.uuid_pedido}}).toPromise().then((result:any)=>{
-      console.log('result',result);
-      let respuesta=result.response;
-      if(respuesta.code==1){
-        this.queryservice.anularPedido(JSON.stringify({id_pedidos:data.id_pedidos})).then((r:any)=>{
-          console.log('result',r);
-          
-          if(r.data.PedidoAnular.resultado=='ok'){
-            data.anular_pedido=1;
-            this.toastservice.presentToast({message:"Pedido anulado correctamente",position:"top",color:"success"})
+
+  Anular_Pedido(data) {
+    console.log('data', data);
+    this.serviciosBase.getAnularTurno({ orden: { id_pedido: data.uuid_pedido } }).toPromise().then((result: any) => {
+      console.log('result', result);
+      let respuesta = result.response;
+      if (respuesta.code == 1) {
+        this.queryservice.anularPedido(JSON.stringify({ id_pedidos: data.id_pedidos })).then((r: any) => {
+          console.log('result', r);
+
+          if (r.data.PedidoAnular.resultado == 'ok') {
+            data.anular_pedido = 1;
+            this.toastservice.presentToast({ message: "Pedido anulado correctamente", position: "top", color: "success" })
           }
         })
-      return
-      }
-      if(respuesta.code==-1){
-        this.toastservice.presentToast({message:"A ocurrido un error: "+respuesta.error,position:"top",color:"warning"})
         return
       }
-      if(respuesta.code==-2){
-        this.toastservice.presentToast({message:"No se puede anular ya que se ha ocupado y asignado una orden real"+respuesta.error,position:"top",color:"warning"})
+      if (respuesta.code == -1) {
+        this.toastservice.presentToast({ message: "A ocurrido un error: " + respuesta.error, position: "top", color: "warning" })
+        return
+      }
+      if (respuesta.code == -2) {
+        this.toastservice.presentToast({ message: "No se puede anular ya que se ha ocupado y asignado una orden real" + respuesta.error, position: "top", color: "warning" })
         return
       }
     })
-    
 
-    
+
+
   }
 
-  checkAnular(orden){
-    let fecha_base=new Date();
-    
-    let fecha_orden= new Date(orden.fec_ord);
-    
-    
-    fecha_orden.setHours((fecha_orden.getHours()+12));
+  checkAnular(orden) {
+    let fecha_base = new Date();
 
-    if(fecha_orden>=fecha_base){
+    let fecha_orden = new Date(orden.fec_ord);
+
+
+    fecha_orden.setHours((fecha_orden.getHours() + 12));
+
+    if (fecha_orden >= fecha_base) {
       return true
     }
-    else{ return false}
+    else { return false }
   }
 
   async presentAlertAnular(data) {
-    console.log('data_anular',data);
-    console.log(JSON.stringify({uuid_anular:data.uuid_pedido}))
-    
+    console.log('data_anular', data);
+    console.log(JSON.stringify({ uuid_anular: data.uuid_pedido }))
+
     const alert = await this.alertController.create({
       header: '¿Desea anular este pedido?',
       message: '',
@@ -648,13 +657,13 @@ if (navigation && navigation.extras && navigation.extras.state) {
         }, {
           text: 'Aceptar',
           handler: () => {
-           
+
             this.Anular_Pedido(data);
           }
         }
       ]
     });
-  
+
     await alert.present();
   }
 }

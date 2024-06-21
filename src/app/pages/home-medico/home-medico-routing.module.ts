@@ -44,7 +44,20 @@ const routes: Routes = [
         loadChildren: () => import('../lista-orden-web/lista-orden-web.module').then( m => m.ListaOrdenWebPageModule),
       },
 
-
+      
+        {
+          path: '',
+          component: HomeMedicoPage,
+          children: [
+            {
+              path: 'lista-pedidos',
+              loadChildren: () => import('../lista-pedidos/lista-pedidos.module').then(m => m.ListaPedidosPageModule)
+            }
+            // otras rutas hijas aquí
+          ]
+        },
+         
+      
 
     ]
   }

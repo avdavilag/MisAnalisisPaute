@@ -93,8 +93,11 @@
           </div>
         </ion-item>
         <div *ngIf="infoText!=''" class="info-text">{{infoText}}</div>
-        <ion-item *ngFor="let orden of lista_filtrar;let index =index; ">
+        <!-- <ion-item *ngFor="let orden of lista_filtrar;let index =index; "> -->
+          <ion-item *ngFor="let orden of lista_filtrar; let index = index;" 
+          [ngClass]="{'item-highlight': orden.id_pedidos === pedido_update}">
      <!-- 
+          
 
           <div class="indice" [slot]="mobile?'':'start'">
             {{index+1}}
