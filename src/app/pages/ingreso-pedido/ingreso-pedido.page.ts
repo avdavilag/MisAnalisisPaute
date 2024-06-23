@@ -1340,43 +1340,91 @@ export class IngresoPedidoPage implements OnInit {
 
 
 
+  // async ViewAnalisisByPedidoTur(cod_pac, fecha_inicial, fecha_final, data) {
+  //   let cod_ana_data = data.cod_ana;
+  //   this.vector_analisis_creacion_view = [];
+  //   let vector_pedidos = [];
+  //   let nombre_medico = '';
+  //   // this.queryservice.getTurnoByDateById(cod_pac,fecha_inicial,fecha_inicial).then((result: any) => { 
+  //     console.log("amtede del query");
+  //   this.queryservice.getTurnoByDateById(cod_pac, '2024/06/12 14:00', '2024/06/12 18:00').then((result: any) => {
+  //     console.log("resultado query");
+  //     vector_pedidos = result.data.getTurnoByDateById;
+  //     console.log("Vector pedidos: ", vector_pedidos);
+  //     vector_pedidos.forEach((pedido) => {
+  //       pedido.Analisis.forEach((cod_ana) => { 
+  //           if (cod_ana.cod_ana == cod_ana_data) {
+  //             console.log("medico ssss : ", pedido.cod_med);
+  //             this.queryservice.getMedicosbyCod(pedido.cod_med).then((result: any) => {
+  //               console.log("RESULTADO: ", result);
+  //               nombre_medico=result.data.getMedicobyCod.nom_med;
+  //               console.log("medico dentro del nombre_medico: ", nombre_medico);
+  //                this.vector_analisis_creacion_view.push({"Cod_Analisis": cod_ana.cod_ana, "Nombre Analisis": cod_ana.des_ana,"Nombre medico":nombre_medico});
+  //           });
+  //           console.log("afuera: ", nombre_medico);
+  //         }
+  //       });
+  //     });
+
+  //   });
+  //   console.log("afuera: ",await this.vector_analisis_creacion_view);
+  //   console.log("length -: ",await this.vector_analisis_creacion_view.length);
+  //   if (await this.vector_analisis_creacion_view.length > 0) {
+  //   this.presentAlertExistAna(await this.vector_analisis_creacion_view);
+  // } 
+  // }
+
   async ViewAnalisisByPedidoTur(cod_pac, fecha_inicial, fecha_final, data) {
     let cod_ana_data = data.cod_ana;
     this.vector_analisis_creacion_view = [];
-    let vector_pedidos = [];
-    // this.queryservice.getTurnoByDateById(cod_pac,fecha_inicial,fecha_inicial).then((result: any) => { 
-      console.log("amtede del query");
-    this.queryservice.getTurnoByDateById(cod_pac, '2024/06/12 14:00', '2024/06/12 18:00').then((result: any) => {
-      console.log("resultado query");
-      vector_pedidos = result.data.getTurnoByDateById;
-
-      vector_pedidos.forEach((pedido) => {
-        pedido.Analisis.forEach((cod_ana) => {
-
-          console.log("Vector pedidos: ", vector_pedidos);
-            if (cod_ana.cod_ana == cod_ana_data) {
-              console.log("medico ssss : ", pedido.cod_med);
-            this.vector_analisis_creacion_view.push({"Cod_Analisis": cod_ana.cod_ana, "Nombre Analisis": cod_ana.des_ana });
-          }
-        });
-      });
-        if (this.vector_analisis_creacion_view.length > 0) {
-        this.presentAlertExistAna(this.vector_analisis_creacion_view);
+    //const vector_pedidos = [];
+   // const nombre_medico = '';
+  
+    console.log("antes del query");
+    const result = await this.queryservice.getTurnoByDateById(cod_pac, '2024/06/12 14:00', '2024/06/12 18:00') as any;;
+    console.log("resultado query");
+   const vector_pedidos = result.data.getTurnoByDateById;
+    console.log("Vector pedidos: ", vector_pedidos);
+  
+    for (let pedido of vector_pedidos) {
+      for (let cod_ana of pedido.Analisis) {
+        if (cod_ana.cod_ana == cod_ana_data) {
+          console.log("medico ssss : ", pedido.cod_med);
+          let resultMedico = await this.queryservice.getMedicosbyCod(pedido.cod_med)as any;
+          console.log("RESULTADO: ", resultMedico);
+          const nombre_medico = resultMedico.data.getMedicobyCod.nom_med;
+          console.log("medico dentro del nombre_medico: ", nombre_medico);
+          this.vector_analisis_creacion_view.push({"Cod_Analisis": cod_ana.cod_ana, "Nombre Analisis": cod_ana.des_ana, "Nombre medico": nombre_medico});
+        }
       }
-    });
+    }
+  
+    console.log("afuera: ", this.vector_analisis_creacion_view);
+    console.log("length -: ", this.vector_analisis_creacion_view.length);
+    if (this.vector_analisis_creacion_view.length > 0) {
+      this.presentAlertExistAna(this.vector_analisis_creacion_view);
+    }
   }
 
-
-async presentAlertExistAna(vector_analisis_creacion_view) {
-  console.log('vector_analisis_creacion_view - vector_analisis_creacion_view: ', vector_analisis_creacion_view);
-  const alert = await this.alertController.create({
-    header: '! Información !',
-    message: 'Este Paciente ya tiene este Analisis Creado .',
-    buttons: ['Cerrar']
-  });
-
-  await alert.present();
-}
+  async presentAlertExistAna(vector_analisis_creacion_view) {
+    let message = 'Este Paciente ya tiene este(s) Análisis Creado(s):<br><br>';
+    vector_analisis_creacion_view.forEach((analisis) => {
+      message += `Código de Análisis: <span style="background: aquamarine;">${analisis.Cod_Analisis}</span><br>`;
+            // message += `Código de Análisis: <span style="background: darkturquoise">${analisis.Cod_Analisis}</span><br>`;
+     // message += `Código de Análisis: ${analisis.Cod_Analisis}<br>`;
+      message += `Nombre de Análisis: ${analisis["Nombre Analisis"]}<br>`;
+      message += `Nombre del Médico: ${analisis["Nombre medico"]}<br><br>`;
+    });
+  
+    console.log('vector_analisis_creacion_view - vector_analisis_creacion_view: ', vector_analisis_creacion_view);
+    const alert = await this.alertController.create({
+      header: '! Información !',
+      message: message,
+      buttons: ['Cerrar']
+    });
+  
+    await alert.present();
+  }
 
 
 formatDateConsultaDatos(dateObject: Date): string {
