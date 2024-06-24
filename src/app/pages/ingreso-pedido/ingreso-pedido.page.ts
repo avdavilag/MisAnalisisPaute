@@ -61,9 +61,9 @@ export class IngresoPedidoPage implements OnInit {
 
   // ]
   ListEstado: any = [
-    { descripcion: "RUTINA", codigo: 0, icono: "calendar-number", color: "#008c33" },
-    { descripcion: "PRIORIDAD", codigo: 2, icono: "warning", color: "#ff790d" },
-    { descripcion: "EMERGENCIA", codigo: 1, icono: "alarm", color: "#ff0000" },
+    { descripcion: "RUTINA", codigo: 0, icono: "calendar-number", color:"#b8fadd",border:"1px solid #1acd81"},
+    { descripcion: "PRIORIDAD", codigo: 2, icono: "warning", color: "#ffdaa8"},
+    { descripcion: "EMERGENCIA", codigo: 1, icono: "alarm", color: "#ff9494"}
   ];
 
 
@@ -1210,11 +1210,13 @@ export class IngresoPedidoPage implements OnInit {
     if (this.inputDiagnostico == '') {
       return
     }
+    
     this.queryservice.searchDiagnostico(this.inputDiagnostico).then((result: any) => {
       console.log('result', result);
       let data = result.data.searchDiagnostico;
       this.show_listaDiagnostico = true
       this.ListDiagnostico = data;
+      this.desactivar_segment_nombre_cedula = false;
     })
   }
 
@@ -1863,7 +1865,7 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
     this.ListaAnalisis = [];
     this.ListaAnalisisTemp = [];
     this.diagnostico = [];
-    this.inputObservacion = "";
+    this.inputObservacion = "Sin Observaciones";
     //this.inputFechaExamen = '';
     this.inputCedula = '';
     this.diagnosticoextra = [];
