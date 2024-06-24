@@ -315,20 +315,23 @@ export class IngresoPedidoPage implements OnInit {
     this.pac_sex_input_config = this.appConfig.pac_sex;
 
     this.ListLugar = this.appConfig.listado_lugar_pedido;
+    console.log("this.ListLugar verificar por favor: ",this.ListLugar) ;
     // console.log('this.ListLugar', this.ListLugar);
     // console.log('this.lugar', this.lugar);
     if (this.varGlobal.getLugarPedido() != '') {
       this.lugar = this.ListLugar.filter(r => r.codigo == this.varGlobal.getLugarPedido())
       console.log('This.lugar verificar ahora mismo: ', this.lugar);
       this.lugar = this.lugar[0];
+      
     }
+    console.log("this.lugar codigo ",this.lugar) ;
 
 
     // console.log('this.lugar2', this.lugar);
     if (!this.appConfig.lugar_default && this.appConfig.active_lugar_pedido) {
       this.presentAlertLugar();
     }
-    // console.log('tkkhis.lugar.ListEstadoListEstado', this.ListEstado);
+   console.log('tkkhis.lugar.ListEstadoListEstado', this.ListEstado);
 
     if (this.lugar.codigo == 2) {
       this.checkTurno_avdg(this.lugar);
@@ -388,14 +391,16 @@ export class IngresoPedidoPage implements OnInit {
     this.ListAnalisis_tempo_update_pedido = [];
     this.ListaAnalisis = [];
 
+   
+      
+      
 
-    this.lugar = [];
     // this.pedido_duplicar='';
     this.minDate = new Date();
     this.minDate = this.helperservice.soloFecha(this.minDate)
     this.pedido_duplicar = this.varGlobal.getPedido_d();
     if (this.pedido_duplicar) {
-
+      this.lugar = [];
       let data = this.pedido_duplicar;
       this.id_pedidos_retorno_listado = data.id_pedidos;
       if (this.id_pedidos_retorno_listado != null) {
@@ -1248,7 +1253,9 @@ export class IngresoPedidoPage implements OnInit {
       let data = result.data.searchUnidad;
       this.listUnidad = data;
       this.show_listaUnidad = true
-    })
+
+    });
+    console.log('this.listUnidad de datos: ', this.listUnidad);
   }
 
   selectUnidad(data) {
@@ -1546,36 +1553,74 @@ formatDateConsultaDatos(dateObject: Date): string {
 
   async presentAlertUpdate() {
     this.ListAnalisis_tempo_update_pedido = [];
-    console.log('presentAlertUpdate: presentAlertUpdate: ', this.ListaAnalisis);
-    console.log('pedidos id: ', this.pedido_duplicar.id_pedidos);
-    let array_turno_array = [];
-    let id_turno = await this.getIdturnoPedidos(this.pedido_duplicar.uuid_pedido);
-    for (const element of this.ListaAnalisis) {
-      console.log('element cod Ana: ', element.cod_ana);
-      const result: any = await this.queryservice.getAnalisisPedidosTurno(this.pedido_duplicar.id_pedidos, element.cod_ana);
-      console.error("Resultado de getAnalisisPedidosTurno: ", result);
-      if (result.data.getAnalisisPedidosTurno.mensaje === '-1') {
-        this.ListAnalisis_tempo_update_pedido.push(element);
-        console.log("id_turno presentAlertUpdate: ", id_turno);
-      }
+    // formatTime
+    const fechaUTC = new Date(this.pedido_duplicar.fec_examen + "T00:00:00Z");
+    let fecha_update:string = this.formatTime(fechaUTC);
+    
+    
+    
+    if (fecha_update === this.inputFechaExamen) {
+ let array_turno_array = [];
+ let id_turno = await this.getIdturnoPedidos(this.pedido_duplicar.uuid_pedido);
+ for (const element of this.ListaAnalisis) {
+   console.log('element cod Ana: ', element.cod_ana);
+   const result: any = await this.queryservice.getAnalisisPedidosTurno(this.pedido_duplicar.id_pedidos, element.cod_ana);
+   console.error("Resultado de getAnalisisPedidosTurno: ", result);
+   if (result.data.getAnalisisPedidosTurno.mensaje === '-1') {
+     this.ListAnalisis_tempo_update_pedido.push(element);
+     console.log("id_turno presentAlertUpdate: ", id_turno);
+   }
+ }
+
+ array_turno_array.push({ id_pedidos: this.pedido_duplicar.id_pedidos, id_turno: id_turno, num_ana: this.ListAnalisis_tempo_update_pedido.length });
+ this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido,this.inputObservacion,this.inputFechaExamen);
+    } else {
+        this.presentAlertChangeDate(this.inputFechaExamen);
     }
-
-    array_turno_array.push({ id_pedidos: this.pedido_duplicar.id_pedidos, id_turno: id_turno, num_ana: this.ListAnalisis_tempo_update_pedido.length });
-
-    // this.ListAnalisis_tempo_update_pedido.push({ id_pedidos: this.pedido_duplicar.id_pedidos });        
-    // this.ListAnalisis_tempo_update_pedido.push({ id_turno: id_turno });
-    // this.ListAnalisis_tempo_update_pedido.push(this.ListAnalisis_tempo_update_pedido);
-    console.log("ListAnalisis_tempo_update_pedido: ", this.ListAnalisis_tempo_update_pedido);
-    console.log("Si ListAnalisis_tempo_update_pedidos: ", JSON.stringify(this.ListAnalisis_tempo_update_pedido));
-    console.log("Lista de array_turno_array array_turno_array: ", array_turno_array);
-    console.log("No array_turno_array el análisis en la tabla de pedidos: ", JSON.stringify(array_turno_array));
-
-    this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido);
-
-    // console.log("No existe el análisis en la tabla de pedidos: ", JSON.stringify(this.ListAnalisis_tempo_update_pedido));
   }
 
-  async presentAddAnalisisPedido(json_datos, json_ana, lista?) {
+  async presentAlertChangeDate(fecha_modificar) {
+
+    const alert = await this.alertController.create({
+      header: '! Esta Seguro !',
+      message: '<div style="text-align:center">! De Cambiar la fecha de este pedido !</div>',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: "Si",
+          handler: async () => {
+            // Asegúrate de que la función que contiene este código sea async
+let array_turno_array = [];
+let id_turno = await this.getIdturnoPedidos(this.pedido_duplicar.uuid_pedido); // Asumiendo que getIdturnoPedidos devuelve una promesa
+for (const element of this.ListaAnalisis) {
+  console.log('element cod Ana: ', element.cod_ana);
+  try {
+    const result: any = await this.queryservice.getAnalisisPedidosTurno(this.pedido_duplicar.id_pedidos, element.cod_ana);
+    console.error("Resultado de getAnalisisPedidosTurno: ", result);
+    if (result && result.data && result.data.getAnalisisPedidosTurno.mensaje === '-1') {
+      this.ListAnalisis_tempo_update_pedido.push(element);
+      console.log("id_turno presentAlertUpdate: ", id_turno);
+    }
+  } catch (error) {
+    console.error("Error al obtener datos de getAnalisisPedidosTurno: ", error);
+  }
+}
+
+array_turno_array.push({ id_pedidos: this.pedido_duplicar.id_pedidos, id_turno: id_turno, num_ana: this.ListAnalisis_tempo_update_pedido.length });
+this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido, this.inputObservacion, fecha_modificar);
+        }
+        }, {
+          text: "No",
+          handler: () => {
+            
+          }
+        }]
+    });
+    await alert.present();
+  }
+
+  async presentAddAnalisisPedido(json_datos, json_ana, lista,inputObservacion?,fecha_examen?) {
+
     const alert = await this.alertController.create({
       header: '! Esta Seguro !',
       message: '<div style="text-align:center">! De Modificar este pedido !</div>',
@@ -1584,7 +1629,7 @@ formatDateConsultaDatos(dateObject: Date): string {
         {
           text: "Si",
           handler: () => {
-            this.queryservice.insertPedAnaxTur(json_datos, json_ana).then((result: any) => {
+            this.queryservice.insertPedAnaxTur(json_datos, json_ana,inputObservacion,fecha_examen).then((result: any) => {
               console.log("result insertPedAnaxTur en verificacion: ", result);
               if(result.data.insertPedAnaxTur.data === "0"){
                 this.toastservice.presentToast({ message: result.data.insertPedAnaxTur.mensaje, position: "buttom", color: "success" })
@@ -1883,9 +1928,9 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
   flag_consulta_externa: boolean = false;
 
   formatTime(date: Date): string {
-    let year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let day = date.getDate();
+    let year = date.getUTCFullYear(); // Usa getUTCFullYear() para obtener el año en UTC
+    let month = date.getUTCMonth() + 1; // getUTCMonth() devuelve el mes en UTC (0-indexado)
+    let day = date.getUTCDate(); // Usa getUTCDate() para obtener el día del mes en UTC
     let monthString = month < 10 ? '0' + month : '' + month;
     let dayString = day < 10 ? '0' + day : '' + day;
     return `${year}-${monthString}-${dayString}`;
@@ -1915,7 +1960,9 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
       this.flag_emergencia = true;
       this.flag_ocultar_fecha = false;
       if (this.pedido_duplicar !== null && this.pedido_duplicar !== undefined) {
-        this.inputFechaExamen = this.formatTime(new Date(this.pedido_duplicar.fec_examen));
+        console.log('pedido duplicar fec_examen: ', this.pedido_duplicar.fec_examen);
+        const fechaUTC = new Date(this.pedido_duplicar.fec_examen + "T00:00:00Z");
+        this.inputFechaExamen = this.formatTime(fechaUTC);
         console.log('pedido duplicar mod: ', this.inputFechaExamen);
 
       }
@@ -1923,7 +1970,7 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
       this.checkTurno();
     } else if (lugar.descripcion === "EMERGENCIA") {
       console.log('FALSE DE EMERGENCIA');
-
+     
       if (this.desactivar_segment_nombre_cedula) {
         this.variable_activar_fecha = true;
       }

@@ -554,15 +554,19 @@ getTurnosbyUidd(uuid) {
 
 //////////////////////////////
 //////////////////////////////
-insertPedAnaxTur(json_datos,json_ana) {
+insertPedAnaxTur(json_datos,json_ana,inputObservacion,fecha_examen) {
   let gqldata = gql`
 mutation insertPedAnaxTur(
     $json_datos:String!,
-    $json_ana:String!
+    $json_ana:String!,
+    $inputObservacion:String!,
+    $fecha_examen:String!
    ) {
     insertPedAnaxTur(
       json_datos:$json_datos,
-      json_ana:$json_ana
+      json_ana:$json_ana,
+      inputObservacion:$inputObservacion,
+      fecha_examen:$fecha_examen                                                   
  ) {
     mensaje
     resultado
@@ -574,7 +578,9 @@ mutation insertPedAnaxTur(
       mutation: gqldata,
       variables: {
         json_datos: json_datos,
-        json_ana:json_ana
+        json_ana:json_ana,
+        inputObservacion:inputObservacion,
+        fecha_examen:fecha_examen
       }
     }).toPromise();
 
