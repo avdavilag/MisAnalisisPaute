@@ -2,7 +2,7 @@
 
 
   <ion-row>
-    <ion-col size="4" size-xm="4" size-sm="4" size-md="4" size-lg="4" size-xl="4">
+    <ion-col size="4" size-xs="12">
       <div class="franja_usr">
         <ion-icon name="person-circle-outline"></ion-icon> {{des_usr}}
       </div>
@@ -16,8 +16,8 @@
 
 
   <ion-row class="row_container">
-    <ion-col size-xs="12" size-sm="5" size-md="5" size-lg="5" size-xl="5" style="padding-top: 0px;height: 40pc">
-
+    <ion-col size-xs="12" size-sm="5" size-md="5" size-lg="5" size-xl="5">
+      <div class="scrollable-content">
       <ion-card style="width: 100%;">
         <ion-toolbar color="secondary" class="ion-text-center">Datos del Paciente
           <ion-buttons *ngIf="!desactivar_segment_nombre_cedula" slot="end" class="ion-text-end" style="background: lightskyblue;margin-right: 1px;">
@@ -324,6 +324,7 @@
           </ion-card-content>
         </ion-card-content>
       </ion-card>
+      </div>      
     </ion-col>
 
 

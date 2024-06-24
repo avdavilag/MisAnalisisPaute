@@ -16,6 +16,7 @@ import { ToastService } from 'src/app/servicios/toast.service';
 import { VariablesGlobalesService } from 'src/app/servicios/variables/variables-globales.service';
 import { AppConfigService } from 'src/app/utils/app-config-service';
 import { Utilidades } from 'src/app/utils/utilidades';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-lista-pedidos',
@@ -46,6 +47,7 @@ export class ListaPedidosPage implements OnInit {
   public fecha_comparar = new Date();
   public flag_pintar_item = false;
   public pedido_update=null;
+  tablet=false;
 
   f_desde;
   f_hasta;
@@ -90,7 +92,13 @@ export class ListaPedidosPage implements OnInit {
   }
 
   ngOnInit() {
-    
+
+    if (window.screen.width <= 768 || window.innerWidth <= 768) { // 768px portrait        
+      this.tablet = true;
+    } else {
+      this.tablet = false;
+      
+    }
     if (window.screen.width < 600 || window.innerWidth < 600) { // 768px portrait        
       this.mobile = true;
     } else {
@@ -129,6 +137,7 @@ export class ListaPedidosPage implements OnInit {
     this.lista_filtrar = [];
     this.lista_temporal = [];
 
+    console.log('flag_pintar_item - pedido_update: ', this.flag_pintar_item);
     let fecha_hoy = new Date;
     let dias = 5;
     this.f_hasta = fecha_hoy.toISOString().split("T")[0];
@@ -585,15 +594,54 @@ export class ListaPedidosPage implements OnInit {
     await alert.present();
   }
 
+
   go_ingresar_duplicado(data) {
-    //console.log(data);
-    this.varGlobal.setPedido_d(data);
-    //sessionStorage.setItem('orden_duplicar',JSON.stringify(data));
-    this.router.navigateByUrl("/home-medico/ingreso-pedido", { replaceUrl: true })
+this.queryservice.getVerificarNroOrdenTurnos(data.uuid_pedido).then((result: any) => {  
+let numero_orden_desde_turnos=result.data.getVerificarNroOrdenTurnos[0].nro_ord;
+console.log('numero_orden_desde_turnos',numero_orden_desde_turnos);
+if(numero_orden_desde_turnos===null || numero_orden_desde_turnos===undefined || numero_orden_desde_turnos===""){
+   this.varGlobal.setPedido_d(data);
+    sessionStorage.setItem('orden_duplicar',JSON.stringify(data));
+   this.router.navigateByUrl("/home-medico/ingreso-pedido", { replaceUrl: true })
+}else{
+  this.presentAlertYaesOrden(data.id_pedidos);
+}
+  });
   }
 
 
+  
 
+  // async presentAlertYaesOrden(id_pedido) {
+  //   await Swal.fire({
+  //     title: '¡Lo siento!',
+  //     text: `No puedes modificar el pedido: ${id_pedido} porque ya está ingresado en Laboratorio.`,
+  //     icon: 'error',
+  //     confirmButtonText: 'Aceptar',
+  //     customClass: {
+  //       confirmButton: 'my-custom-class' // Asegúrate de definir esta clase en tus estilos CSS
+  //     }
+  //   });
+  // }
+  async presentAlertYaesOrden(id_pedido) {
+    await Swal.fire({
+      title: '¡Lo siento!',
+      text:  `No es posible modificar el pedido: ${id_pedido}, porque ya se encuentra ingresado en Laboratorio.`,
+      icon: 'question',
+      confirmButtonText: 'Aceptar',
+      width: '300px',
+      padding: '1em',
+      backdrop: true,
+      allowOutsideClick: true, 
+      heightAuto: false, 
+      grow: 'row', 
+      customClass: {
+        confirmButton: 'my-custom-class',
+        popup: 'custom-popup-class'
+      },
+      background: '#fff',
+    });
+  }
 
   Anular_Pedido(data) {
     console.log('data', data);

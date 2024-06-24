@@ -721,7 +721,6 @@ export class PdfPreviewPage implements OnInit {
 console.log("orden a render",orden);
     
 
-
     let valores_enviar = {
       "nombreLab": "",
       "firma": this.firma_orden,

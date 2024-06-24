@@ -387,7 +387,7 @@ export class IngresoPedidoPage implements OnInit {
   }
 
   ionViewWillEnter() {
-
+this.LimpiarTodo();
     this.ListAnalisis_tempo_update_pedido = [];
     this.ListaAnalisis = [];
 
@@ -1877,8 +1877,12 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
     console.log("this.elegir_variable:  elegigir Variab=" + this.elegir_variable);
 
     if (this.elegir_variable === undefined || this.elegir_variable === '' || this.elegir_variable === null) {
+      console.log("this.inputFechaExamen antes" + this.inputFechaExamen);
+      console.log("helper" + this.helperservice.soloFecha(forden));      
       this.inputFechaExamen = this.helperservice.soloFecha(forden);
+      this.pedido_duplicar=null;
     }
+    console.log("this.despues" + this.inputFechaExamen);
     this.checkTurno_avdg(this.lugar, this.inputFechaExamen, this.elegir_variable);
 
     if (!this.appConfig.lugar_default && this.appConfig.active_lugar_pedido) {

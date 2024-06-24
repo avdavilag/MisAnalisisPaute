@@ -255,7 +255,7 @@ export class QueryService {
 
 
   getFechadeNacimiento(fecha) {
-    console.log('Fecha_nacimiento: ',fecha);
+    console.log('Fecha_nacimiento: ', fecha);
     let gqldata = gql`
       query getEdadPac($fecha: String!) {
         getEdadPac(fecha: $fecha) {
@@ -468,10 +468,10 @@ query test($jsonText:String!){
     return result;
 
   }
-  
+
   ////////getOrdenxIndividual///////////
   getOrdenbyCodPac(cod_pac) {
- 
+
     let query = gql`
     query  getOrdenbyCodPac($cod_pac:String!){
         getOrdenbyCodPac(cod_pac:$cod_pac){
@@ -484,15 +484,15 @@ query test($jsonText:String!){
     }`;
     let result = this.apollo.use('api_avalab').query({
       query: query,
-      variables: {cod_pac:cod_pac}
+      variables: { cod_pac: cod_pac }
     }).toPromise();
     return result;
   }
 
-////getTurnosbyCodPac/////
-getTurnosbyCodPac(cod_pac) {
- 
-  let query = gql`
+  ////getTurnosbyCodPac/////
+  getTurnosbyCodPac(cod_pac) {
+
+    let query = gql`
   query  getTurnosbyCodPac($cod_pac:String!){
     getTurnosbyCodPac(cod_pac:$cod_pac){
     id
@@ -504,40 +504,40 @@ getTurnosbyCodPac(cod_pac) {
     prioridad
     }    
   }`;
-  let result = this.apollo.use('api_avalab').query({
-    query: query,
-    variables: {cod_pac:cod_pac}
-  }).toPromise();
-  return result;
-}
-//////////
+    let result = this.apollo.use('api_avalab').query({
+      query: query,
+      variables: { cod_pac: cod_pac }
+    }).toPromise();
+    return result;
+  }
+  //////////
 
-DeleteTurxAnaPedido(id_turno, cod_ana, id_pedidos) {
-  let mutation = gql`
+  DeleteTurxAnaPedido(id_turno, cod_ana, id_pedidos) {
+    let mutation = gql`
     mutation DeleteTurxAnaPedido($id_turno: String!, $cod_ana: String!, $id_pedidos: String!) {
       DeleteTurxAnaPedido(id_turno: $id_turno, cod_ana: $cod_ana, id_pedidos: $id_pedidos) {
         mensaje
       }
     }
   `;
-  let result = this.apollo.use('api_avalab').mutate({
-    mutation: mutation,
-    variables: {
-      id_turno: id_turno,
-      cod_ana: cod_ana,
-      id_pedidos: id_pedidos
-    }
-  }).toPromise();
+    let result = this.apollo.use('api_avalab').mutate({
+      mutation: mutation,
+      variables: {
+        id_turno: id_turno,
+        cod_ana: cod_ana,
+        id_pedidos: id_pedidos
+      }
+    }).toPromise();
 
-  return result;
-}
+    return result;
+  }
 
-//////////11111111111111111111
+  //////////11111111111111111111
 
 
-getTurnosbyUidd(uuid) {
- 
-  let query = gql`
+  getTurnosbyUidd(uuid) {
+
+    let query = gql`
   query  getTurnosbyUidd($uuid:String!){
     getTurnosbyUidd(uuid:$uuid){
     id
@@ -545,17 +545,17 @@ getTurnosbyUidd(uuid) {
  	  nota_tur
     }    
   }`;
-  let result = this.apollo.use('api_avalab').query({
-    query: query,
-    variables: {uuid:uuid}
-  }).toPromise();
-  return result;
-}
+    let result = this.apollo.use('api_avalab').query({
+      query: query,
+      variables: { uuid: uuid }
+    }).toPromise();
+    return result;
+  }
 
-//////////////////////////////
-//////////////////////////////
-insertPedAnaxTur(json_datos,json_ana,inputObservacion,fecha_examen) {
-  let gqldata = gql`
+  //////////////////////////////
+  //////////////////////////////
+  insertPedAnaxTur(json_datos, json_ana, inputObservacion, fecha_examen) {
+    let gqldata = gql`
 mutation insertPedAnaxTur(
     $json_datos:String!,
     $json_ana:String!,
@@ -573,21 +573,21 @@ mutation insertPedAnaxTur(
     data
   }
 }`;
-  let result =
-    this.apollo.use('api_avalab').mutate({
-      mutation: gqldata,
-      variables: {
-        json_datos: json_datos,
-        json_ana:json_ana,
-        inputObservacion:inputObservacion,
-        fecha_examen:fecha_examen
-      }
-    }).toPromise();
+    let result =
+      this.apollo.use('api_avalab').mutate({
+        mutation: gqldata,
+        variables: {
+          json_datos: json_datos,
+          json_ana: json_ana,
+          inputObservacion: inputObservacion,
+          fecha_examen: fecha_examen
+        }
+      }).toPromise();
 
-  return result;
-}
+    return result;
+  }
 
-//////////////////////////////
+  //////////////////////////////
   insertPacienteComplete(data) {
     let gqldata = gql`
   mutation insertPacienteComplete(
@@ -612,10 +612,10 @@ mutation insertPedAnaxTur(
     return result;
   }
 
-////////////////////ANDERSON INGRESO DE DOCTOR/////// /////////////////////////////////////
-insertMedicoComplete(data) {
-  console.log('Data Ionic: ',data);
-  let gqldata = gql`
+  ////////////////////ANDERSON INGRESO DE DOCTOR/////// /////////////////////////////////////
+  insertMedicoComplete(data) {
+    console.log('Data Ionic: ', data);
+    let gqldata = gql`
   mutation insertMedicoLite(
       $json_med:String,
      ) {
@@ -627,21 +627,21 @@ insertMedicoComplete(data) {
       data
     }
 }`;
-  let result =
-    this.apollo.use('api_avalab').mutate({
-      mutation: gqldata,
-      variables: {
-        json_med: data
-      }
-    }).toPromise();
-    console.log('result GRAPHQL: ',result);
-  return result;
-}
+    let result =
+      this.apollo.use('api_avalab').mutate({
+        mutation: gqldata,
+        variables: {
+          json_med: data
+        }
+      }).toPromise();
+    console.log('result GRAPHQL: ', result);
+    return result;
+  }
 
 
-///////////////////MEDICO ELABORADO POR ANDERSON//////////////////////////////////////
-SearchMedicoDynamic(data) {
-  let gqlgetMedicos = gql`
+  ///////////////////MEDICO ELABORADO POR ANDERSON//////////////////////////////////////
+  SearchMedicoDynamic(data) {
+    let gqlgetMedicos = gql`
   query searchMedicoDynamic($id_med:String,$nom_med:String,$cel_med:String,$cod_med:String,$col_med:String){
   searchMedicoDynamic(id_med:$id_med,nom_med:$nom_med,cel_med:$cel_med,cod_med:$cod_med,col_med:$col_med){   
   cod_med
@@ -662,16 +662,16 @@ SearchMedicoDynamic(data) {
   cod_aux
 }
 } `;
-  let result = this.apollo.use('api_avalab').query({
-    query: gqlgetMedicos,
-    variables: data
-  }).toPromise();
-  return result;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////
+    let result = this.apollo.use('api_avalab').query({
+      query: gqlgetMedicos,
+      variables: data
+    }).toPromise();
+    return result;
+  }
+  /////////////////////////////////////////////////////////////////////////////////////////////
 
   actualizarMedico(data) {
-    console.log('Clase Graph: '+data);
+    console.log('Clase Graph: ' + data);
     let gqldata = gql`
   mutation UpdateMedico(
       $json_medico_upd:String,
@@ -684,7 +684,7 @@ SearchMedicoDynamic(data) {
       data
     }
   }`;
-  
+
     let result =
       this.apollo.use('api_avalab').mutate({
         mutation: gqldata,
@@ -692,13 +692,13 @@ SearchMedicoDynamic(data) {
           json_medico_upd: data
         }
       }).toPromise();
-  
+
     return result;
   }
-  
+
 
   actualizarPaciente(data) {
-    console.log('Clase Graph: '+data);
+    console.log('Clase Graph: ' + data);
     let gqldata = gql`
   mutation UpdatePaciente(
       $json_paciente_upd:String,
@@ -711,7 +711,7 @@ SearchMedicoDynamic(data) {
       data
     }
   }`;
-  
+
     let result =
       this.apollo.use('api_avalab').mutate({
         mutation: gqldata,
@@ -719,13 +719,13 @@ SearchMedicoDynamic(data) {
           json_paciente_upd: data
         }
       }).toPromise();
-  
+
     return result;
   }
 
 
-UpdatePacienteLite(data) {
-    console.log('Clase UpdatePacienteLite: '+data);
+  UpdatePacienteLite(data) {
+    console.log('Clase UpdatePacienteLite: ' + data);
     let gqldata = gql`
       mutation updatePacienteLite(
           $json_paciente_upd:String,
@@ -738,20 +738,20 @@ UpdatePacienteLite(data) {
           data
         }
       }`;
-  
+
     let result = this.apollo.use('api_avalab').mutate({
-        mutation: gqldata,
-        variables: {
-          json_paciente_upd: data
-        }
-      }).toPromise()
+      mutation: gqldata,
+      variables: {
+        json_paciente_upd: data
+      }
+    }).toPromise()
       .catch(error => {
-          console.error('Error en UpdatePacienteLite:', error);
-          throw error;
+        console.error('Error en UpdatePacienteLite:', error);
+        throw error;
       });
-  
+
     return result;
-}
+  }
 
 
   getListPoblacion() {
@@ -767,14 +767,14 @@ UpdatePacienteLite(data) {
    cod_anc
    first_user
    }} `;
-   let result = this.apollo.use('api_avalab').query({
-       query: gqlquery,
-     }).toPromise();
-   
-     return result
-   }
-   
-   getListUnidad() {
+    let result = this.apollo.use('api_avalab').query({
+      query: gqlquery,
+    }).toPromise();
+
+    return result
+  }
+
+  getListUnidad() {
     let query = gql`
   {
     ListUnidad{
@@ -1145,9 +1145,9 @@ query  getMedicobyCed($id_med:String!){
 
     return result;
   }
-///////ViewAnalisisByPedidoTur-getTurnoByDateById///////////////////////////////////////
-getTurnoByDateById(cod_pac,fec_ini_inicial,fec_ini_final) {
-  let getTurnoByDateById = gql`
+  ///////ViewAnalisisByPedidoTur-getTurnoByDateById///////////////////////////////////////
+  getTurnoByDateById(cod_pac, fec_ini_inicial, fec_ini_final) {
+    let getTurnoByDateById = gql`
 query getTurnoByDateById($cod_pac:String!,$fec_ini_inicial:String!,$fec_ini_final:String!){
   getTurnoByDateById(cod_pac:$cod_pac,fec_ini_inicial:$fec_ini_inicial,fec_ini_final:$fec_ini_final){
     id_pedidos,
@@ -1161,18 +1161,18 @@ query getTurnoByDateById($cod_pac:String!,$fec_ini_inicial:String!,$fec_ini_fina
   }
 }
 `;
-  let result = this.apollo.use('api_avalab').query({
-    query: getTurnoByDateById,
-    variables: {
-      cod_pac:cod_pac,
-      fec_ini_inicial:fec_ini_inicial,
-      fec_ini_final: fec_ini_final
-    }
-  }).toPromise();
-  return result
-}
-///////ViewAnalisisByPedidoTur-getTurnoByDateById///////////////////////////////////////
-///////FIN///////////////////////////////////////
+    let result = this.apollo.use('api_avalab').query({
+      query: getTurnoByDateById,
+      variables: {
+        cod_pac: cod_pac,
+        fec_ini_inicial: fec_ini_inicial,
+        fec_ini_final: fec_ini_final
+      }
+    }).toPromise();
+    return result
+  }
+  ///////ViewAnalisisByPedidoTur-getTurnoByDateById///////////////////////////////////////
+  ///////FIN///////////////////////////////////////
 
 
 
@@ -1396,7 +1396,7 @@ query PreciosbySeguro($cod_ana:String!,$cod_lpr:String!){
   ///////INSERT PAGO PILAS////////////
 
   insertPago(data) {
-    console.log('Data de pagos en el graphQl: ',data);
+    console.log('Data de pagos en el graphQl: ', data);
     let gqldata = gql`
     mutation InsertOrdenxPago(
         $json_data:String,    
@@ -1416,22 +1416,22 @@ query PreciosbySeguro($cod_ana:String!,$cod_lpr:String!){
     let result =
       this.apollo.use('api_avalab').mutate({
         mutation: gqldata,
-        variables:data
+        variables: data
       }).toPromise();
 
     return result;
   }
-  
 
 
-   //////////////////getMobFechasTurnos procedimiento de Turnos por favor//////////////////////////////
 
-   getMobFechasTurnos(fecha,ref_tur_externo_ip) {
-    console.error("Fecha antes: "+fecha);
-    console.error("Fecha ref_tur_externo_ip: "+ref_tur_externo_ip);
-    
-   let fecha_base= this.transformDate(fecha);   
-   let gqldata = gql`
+  //////////////////getMobFechasTurnos procedimiento de Turnos por favor//////////////////////////////
+
+  getMobFechasTurnos(fecha, ref_tur_externo_ip) {
+    console.error("Fecha antes: " + fecha);
+    console.error("Fecha ref_tur_externo_ip: " + ref_tur_externo_ip);
+
+    let fecha_base = this.transformDate(fecha);
+    let gqldata = gql`
     query getMobFechasTurnos( $fecha: String!,$ref_tur_externo_ip: String!) {
         getMobFechasTurnos(fecha:$fecha,variable_referencia:$ref_tur_externo_ip) {
             resultado
@@ -1442,19 +1442,20 @@ query PreciosbySeguro($cod_ana:String!,$cod_lpr:String!){
     let result =
       this.apollo.use('api_avalab').query({
         query: gqldata,
-        variables: { fecha: fecha_base,
-          ref_tur_externo_ip:ref_tur_externo_ip
-         } // Aquí está la corrección
+        variables: {
+          fecha: fecha_base,
+          ref_tur_externo_ip: ref_tur_externo_ip
+        } // Aquí está la corrección
       }).toPromise();
 
     return result;
-}
+  }
 
 
   //////////////////Insert of Factura//////////////////////////////
-inserFactura(data) {
-  console.log('Insert-Factra: ',data);
-  let gqldata = gql`
+  inserFactura(data) {
+    console.log('Insert-Factra: ', data);
+    let gqldata = gql`
   mutation InsertFactura(
       $json_factura:String,
       $json_analisis:String,
@@ -1469,14 +1470,14 @@ inserFactura(data) {
     }
 }`;
 
-  let result =
-    this.apollo.use('api_avalab').mutate({
-      mutation: gqldata,
-      variables: data
-    }).toPromise();
+    let result =
+      this.apollo.use('api_avalab').mutate({
+        mutation: gqldata,
+        variables: data
+      }).toPromise();
 
-  return result;
-}
+    return result;
+  }
 
   insertPerfil(data) {
     let gqldata = gql`
@@ -1555,7 +1556,7 @@ inserFactura(data) {
   }
 
   // ---------------------------------Perfiles-----------------------------------------//
-  getPerfilListbyTypeUser(cod_user,type_user) {
+  getPerfilListbyTypeUser(cod_user, type_user) {
     let gqldata = gql`
  query getPerfilListbyTypeUser($cod_user:String!,$type_user:String!){
   getPerfilListbyTypeUser(cod_user:$cod_user,type_user:$type_user){
@@ -2074,6 +2075,25 @@ query PedidobyId($id:String!){
     return result
   }
 
+  getVerificarNroOrdenTurnos(auxiliar) {
+    let gqldata = gql`
+    query getVerificarNroOrdenTurnos($auxiliar:String!){
+      getVerificarNroOrdenTurnos(auxiliar:$auxiliar){
+    id
+    fec_tur
+    nro_ord
+    auxiliar              
+  }
+  } `;
+    let result = this.apollo.use('api_avalab').query({
+      query: gqldata,
+      variables: {
+        auxiliar: auxiliar,
+      }
+    }).toPromise();
+    return result
+  }
+
 
   //metodos resultados
   getOrdenResultados(data) {
@@ -2112,12 +2132,12 @@ query PedidobyId($id:String!){
     }).toPromise();
     return result
   }
-/////
- //metodos resultados
- getTurnosbyDate(fecha,cod_ref) {
-  
-  let fecha_base= this.transformDate(fecha);
-  let gqldata = gql`
+  /////
+  //metodos resultados
+  getTurnosbyDate(fecha, cod_ref) {
+
+    let fecha_base = this.transformDate(fecha);
+    let gqldata = gql`
   query getTurnosbyDate($fec_tur:String!,$cod_ref:String!){
     getTurnosbyDate(fec_tur:$fec_tur,cod_ref:$cod_ref){
       id,
@@ -2139,15 +2159,15 @@ query PedidobyId($id:String!){
     id_plan         
 }
 } `;
-  let result = this.apollo.use('api_avalab').query({
-    query: gqldata,
-    variables: {
-      fec_tur: fecha_base,
-      cod_ref: cod_ref      
-    }
-  }).toPromise();
-  return result
-}
+    let result = this.apollo.use('api_avalab').query({
+      query: gqldata,
+      variables: {
+        fec_tur: fecha_base,
+        cod_ref: cod_ref
+      }
+    }).toPromise();
+    return result
+  }
 
 
 
@@ -2424,7 +2444,7 @@ query PedidobyId($id:String!){
 
 
   getFeriadobyFechabyEvery(fecha) {
-    let fecha_base= this.transformDate(fecha);   
+    let fecha_base = this.transformDate(fecha);
     let gqldata = gql`
     query getFeriadobyFechabyEvery($fecha:String!){
       getFeriadobyFechabyEvery(fecha:$fecha){
@@ -2438,13 +2458,13 @@ query PedidobyId($id:String!){
     let result = this.apollo.use('api_avalab').query({
       query: gqldata,
       variables: {
-        fecha:fecha_base      
+        fecha: fecha_base
       }
     }).toPromise();
     return result
   }
 
-  getAnalisisPedidosTurno(id_pedidos,cod_ana) {
+  getAnalisisPedidosTurno(id_pedidos, cod_ana) {
     let gqldata = gql`
     query getAnalisisPedidosTurno($id_pedidos:String!,$cod_ana:String!){
       getAnalisisPedidosTurno(id_pedidos:$id_pedidos,cod_ana:$cod_ana){
@@ -2453,7 +2473,7 @@ query PedidobyId($id:String!){
   } `;
     let result = this.apollo.use('api_avalab').query({
       query: gqldata,
-      variables: { id_pedidos, cod_ana } 
+      variables: { id_pedidos, cod_ana }
     }).toPromise();
     return result
   }
@@ -2771,37 +2791,37 @@ query UpdateMuestra(
 
 
   getOrdenResultadosSB(data) {
-let finaldata={
-  codigo:'',
-  tipo:'',
-  desde:'',
-  hasta:'',
-  orderby:'',
-  cod_med:'',
-  id_ref:'',
-  id_plan:'',
-  complete:'',
-  nro_orden:'',
-  cod_uni:'',
-  listo_imprime:'',
-  stsList:'',
-  factura:''
-};
+    let finaldata = {
+      codigo: '',
+      tipo: '',
+      desde: '',
+      hasta: '',
+      orderby: '',
+      cod_med: '',
+      id_ref: '',
+      id_plan: '',
+      complete: '',
+      nro_orden: '',
+      cod_uni: '',
+      listo_imprime: '',
+      stsList: '',
+      factura: ''
+    };
 
-if(data.codigo){  finaldata.codigo=data.codigo}
-if(data.tipo){  finaldata.tipo=data.tipo}
-if(data.desde){  finaldata.desde=data.desde}
-if(data.hasta){  finaldata.hasta=data.hasta}
-if(data.orderby){  finaldata.orderby=data.orderby}
-if(data.cod_med){  finaldata.cod_med=data.cod_med}
-if(data.id_ref){  finaldata.id_ref=data.id_ref}
-if(data.id_plan){  finaldata.id_plan=data.id_plan}
-if(data.complete){  finaldata.complete=data.complete}
-if(data.nro_orden){  finaldata.nro_orden=data.nro_orden}
-if(data.cod_uni){  finaldata.cod_uni=data.cod_uni}
-if(data.listo_imprime){  finaldata.listo_imprime=data.listo_imprime}
-if(data.stsList){  finaldata.stsList=data.stsList}
-if(data.factura){  finaldata.factura=data.factura}
+    if (data.codigo) { finaldata.codigo = data.codigo }
+    if (data.tipo) { finaldata.tipo = data.tipo }
+    if (data.desde) { finaldata.desde = data.desde }
+    if (data.hasta) { finaldata.hasta = data.hasta }
+    if (data.orderby) { finaldata.orderby = data.orderby }
+    if (data.cod_med) { finaldata.cod_med = data.cod_med }
+    if (data.id_ref) { finaldata.id_ref = data.id_ref }
+    if (data.id_plan) { finaldata.id_plan = data.id_plan }
+    if (data.complete) { finaldata.complete = data.complete }
+    if (data.nro_orden) { finaldata.nro_orden = data.nro_orden }
+    if (data.cod_uni) { finaldata.cod_uni = data.cod_uni }
+    if (data.listo_imprime) { finaldata.listo_imprime = data.listo_imprime }
+    if (data.stsList) { finaldata.stsList = data.stsList }
+    if (data.factura) { finaldata.factura = data.factura }
 
     let gqldata = gql`
   query getOrdentoResultadosDynamic(
@@ -2981,9 +3001,9 @@ if(data.factura){  finaldata.factura=data.factura}
     }).toPromise();
     return result
   }
-/////////////////////////////Anderson PtoxoribyOri///////////////////////////////////// 
-  PtoxoribyOri(cod_ori){    
-  let gqldataPtoxoribyOri = gql`
+  /////////////////////////////Anderson PtoxoribyOri///////////////////////////////////// 
+  PtoxoribyOri(cod_ori) {
+    let gqldataPtoxoribyOri = gql`
   query PtoxoribyOri($cod_ori:String!){  
   PtoxoribyOri(cod_ori:$cod_ori){
     cod_ori
@@ -3024,15 +3044,15 @@ if(data.factura){  finaldata.factura=data.factura}
   }
     }
   }`;
-  let result = this.apollo.use('api_avalab').query({
-    query: gqldataPtoxoribyOri,
-    variables: { cod_ori: cod_ori }    
-  }).toPromise();
-  return result
+    let result = this.apollo.use('api_avalab').query({
+      query: gqldataPtoxoribyOri,
+      variables: { cod_ori: cod_ori }
+    }).toPromise();
+    return result
   }
 
 
-  getListSucursal(){
+  getListSucursal() {
     let gqldata = gql`
     query{ ListSucursal{
       cod_suc
@@ -3282,11 +3302,11 @@ if(data.factura){  finaldata.factura=data.factura}
       }).toPromise();
 
     return result;
- 
+
   }
-  
-  
-  getOrdenWeb(data){
+
+
+  getOrdenWeb(data) {
     let gqldata = gql`
     query searchWebOrd(
       $fecha_i: String,
@@ -3348,13 +3368,13 @@ if(data.factura){  finaldata.factura=data.factura}
       }).toPromise();
     return result;
   }
-  
+
   transformDate(dateString) {
     let [year, month, day] = dateString.split('-');
     let date = new Date(Number(year), Number(month) - 1, Number(day));
     let dayString = String(date.getDate()).padStart(2, '0');
-    let monthString = String(date.getMonth() + 1).padStart(2, '0'); 
+    let monthString = String(date.getMonth() + 1).padStart(2, '0');
     let yearString = date.getFullYear();
     return `${dayString}/${monthString}/${yearString}`;
-}
+  }
 }

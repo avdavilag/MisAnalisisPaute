@@ -509,3 +509,11 @@ ion-input:hover {
 .highlighted {
   background-color: blue;
 }
+.scrollable-content {
+  height: 40pc;
+} 
+@media (max-width: 768px) {
+  .scrollable-content {
+    overflow-y: auto;
+  }
+}

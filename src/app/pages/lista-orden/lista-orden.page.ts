@@ -630,6 +630,7 @@ export class ListaOrdenPage implements OnInit {
   }
 
   async cargarDatosPaciente(orden, formato = "") {
+    console.log("ORDEN - cargar Paciente", orden);
     if (this.tipo_user == 'int') {
       this.router.navigateByUrl("pdf-preview?param1=" + orden);
       return;
