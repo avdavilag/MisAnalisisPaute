@@ -184,7 +184,7 @@ export class PdfPreviewPage implements OnInit {
 
       }
       // let orden = params['param1'];
-      console.log(orden);
+
       if (!orden) {
         console.log("no existe orden");
         //this.presentAlert("No permitido", "No existe orden");

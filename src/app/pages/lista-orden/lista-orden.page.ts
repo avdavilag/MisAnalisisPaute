@@ -21,7 +21,7 @@ import { Utilidades } from 'src/app/utils/utilidades';
 import { saveAs } from 'file-saver';
 import { PdfRenderService } from 'src/app/servicios/pdf/pdf-render.service';
 import { ListTipoPage } from 'src/app/popover/list-tipo/list-tipo.page';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-lista-orden',
   templateUrl: './lista-orden.page.html',
@@ -52,6 +52,8 @@ export class ListaOrdenPage implements OnInit {
   flag_busquedaxorden:boolean=false
   public formato_pdf_ref = "";
   public flag_view_ord=false;
+  public lista_prass_copy: any = [];
+  mostrarListado: boolean = false;
 
   fecha_desde
   fecha_hasta
@@ -629,6 +631,235 @@ export class ListaOrdenPage implements OnInit {
     this.funcionesComunesIntra.enviarMailIntra(this.tipo_user + "-" + this.var_usr, idOrden, 0, "")
   }
 
+  async cargarDatosPaciente2(orden,variable?) {
+
+console.log('variable get Paciente 2: ',variable);
+
+    this.funcionesComunesIntra.cargoOrdenOriginal(orden).then(result => {
+        this.lista_prass_copy=result;
+    console.log('lista_prass_copy - metodo adquirido de Pdf: ',this.lista_prass_copy);
+
+    if(variable==='titulos'){
+      this.copiarAlPortapapelesComoListaTitulos(this.lista_prass_copy);
+      this.presentAlertCopiado();
+    }else if(variable==='analisis'){
+      this.copiarAlPortapapelesComoListaAnalisis(this.lista_prass_copy);
+      this.presentAlertCopiado();
+    } else if(variable==='todo'){
+      this.copiarAlPortapapelesComoLista(this.lista_prass_copy);
+      this.presentAlertCopiado();
+    }
+
+    });
+  }
+
+  async presentAlertCopiado() {
+    await Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "! Copiado !",
+      showConfirmButton: false,
+      timer: 1500,
+      confirmButtonText: 'Aceptar',
+      width: '300px',
+      padding: '1em',
+      backdrop: true,
+      allowOutsideClick: true, 
+      heightAuto: false, 
+      grow: 'row', 
+      customClass: {
+        confirmButton: 'my-custom-class',
+        popup: 'custom-popup-class',
+        title: 'title-small-font'
+      },
+      background: '#fff',    
+    });
+  }
+
+  async copiarAlPortapapelesComoListaAnalisis(lista_prass_copy) {
+    if (!lista_prass_copy || !Array.isArray(lista_prass_copy)) {
+        console.error('No hay datos para copiar o los datos no son un arreglo.');
+        return;
+    }
+    const agrupadosPorDescripcion = lista_prass_copy.reduce((acc, obj) => {
+        (acc[obj.descripcion_tipo_analisis] = acc[obj.descripcion_tipo_analisis] || []).push(obj);
+        return acc;
+    }, {});
+
+    let textoParaCopiar = '';
+    Object.keys(agrupadosPorDescripcion).forEach(descripcion => {
+        agrupadosPorDescripcion[descripcion].forEach(obj => {
+            const resultado = obj.resultado ? `${obj.resultado} mg/dl` : '';
+            const vdr = obj.vdr_resultado ? ` ${obj.vdr_resultado}` : '';
+            const descripcionParametro = obj.descripcion_parametro.endsWith(':') ? obj.descripcion_parametro.slice(0, -1) : obj.descripcion_parametro;
+            textoParaCopiar += `${descripcionParametro}: ${resultado}${vdr}\n`;
+        });
+    });
+
+    // Crear un elemento textarea temporal en el DOM
+    const textarea = document.createElement('textarea');
+    textarea.value = textoParaCopiar.trim();
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        // Intentar copiar el contenido seleccionado al portapapeles
+        const successful = document.execCommand('copy');
+        const msg = successful ? 'Contenido copiado al portapapeles sin títulos.' : 'No se pudo copiar el contenido al portapapeles.';
+        console.log(msg);
+    } catch (err) {
+        console.error('Error al copiar al portapapeles: ', err);
+    }
+    // Limpiar removiendo el textarea temporal del DOM
+    document.body.removeChild(textarea);
+}
+
+
+
+
+async copiarAlPortapapelesComoListaTitulos(lista_prass_copy) {
+  if (!lista_prass_copy || !Array.isArray(lista_prass_copy)) {
+      console.error('No hay datos para copiar o los datos no son un arreglo.');
+      return;
+  }
+  const agrupadosPorDescripcion = lista_prass_copy.reduce((acc, obj) => {
+      (acc[obj.descripcion_tipo_analisis] = acc[obj.descripcion_tipo_analisis] || []).push(obj);
+      return acc;
+  }, {});
+
+  let textoParaCopiar = '';
+  Object.keys(agrupadosPorDescripcion).forEach(descripcion => {
+      textoParaCopiar += descripcion + '\n';
+  });
+
+  // Crear un elemento textarea temporal en el DOM
+  const textarea = document.createElement('textarea');
+  textarea.value = textoParaCopiar.trim();
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+      // Intentar copiar el contenido seleccionado al portapapeles
+      const successful = document.execCommand('copy');
+      const msg = successful ? 'Contenido copiado al portapapeles solo con descripciones.' : 'No se pudo copiar el contenido al portapapeles.';
+      console.log(msg);
+  } catch (err) {
+      console.error('Error al copiar al portapapeles: ', err);
+  }
+  // Limpiar removiendo el textarea temporal del DOM
+  document.body.removeChild(textarea);
+}
+
+  cerrarModal() {
+    this.modalCtrl.dismiss();
+  }
+
+  seleccionarOpcion(opcion: string) {
+    this.modalCtrl.dismiss(opcion);
+  }
+
+  cerrarDialogo(){
+    this.modalCtrl.dismiss();
+  }
+
+  async abrirDialogoConfirmacion(nroOrd: string) {
+    let seleccionados = {
+      descripcion: false,
+      todo: false,
+    };
+  
+    const alert = await this.alertController.create({
+      header: '! Copiar al Prass !',
+            inputs: [
+        {
+          name: 'analisis',
+          type: 'checkbox',
+          label: 'Resultados',
+          value: 'descripcion',
+          checked: true,
+          handler: () => {
+            console.log('Descripción seleccionada');
+            seleccionados.descripcion = !seleccionados.descripcion;
+            this.cerrarDialogo();
+          }
+        },
+        {
+          name: 'titulos',
+          type: 'checkbox',
+          label: 'Analisis',
+          value: 'todo',
+          checked: true,
+          handler: () => {
+            console.log('Todo seleccionado');
+            seleccionados.todo = !seleccionados.todo;
+            this.cerrarDialogo();
+          }
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
+          }
+        }, {
+          text: 'Ok',
+          handler: (data) => {
+            let variable = 'todo';
+            if (seleccionados.descripcion && seleccionados.todo) {
+              variable = 'todo';
+            } else if (seleccionados.descripcion) {
+              variable = 'titulos';
+            } else if (seleccionados.todo) {
+              variable = 'analisis';
+            }
+            console.log('Variable de variables: ', variable);
+            this.cargarDatosPaciente2(nroOrd, variable);
+          }
+        }
+      ]
+    });  
+    await alert.present();
+  }
+
+  // <ion-checkbox>Themed checkbox</ion-checkbox>
+  async copiarAlPortapapelesComoLista(lista_prass_copy) {
+    if (!lista_prass_copy || !Array.isArray(lista_prass_copy)) {
+        console.error('No hay datos para copiar o los datos no son un arreglo.');
+        return;
+    }
+    const agrupadosPorDescripcion = lista_prass_copy.reduce((acc, obj) => {
+        (acc[obj.descripcion_tipo_analisis] = acc[obj.descripcion_tipo_analisis] || []).push(obj);
+        return acc;
+    }, {});
+
+    let textoParaCopiar = '';
+    Object.keys(agrupadosPorDescripcion).forEach(descripcion => {
+        textoParaCopiar += descripcion + '\n';
+        agrupadosPorDescripcion[descripcion].forEach(obj => {
+            const resultado = obj.resultado ? `${obj.resultado} mg/dl` : '';
+            const vdr = obj.vdr_resultado ? ` ${obj.vdr_resultado}` : '';
+            const descripcionParametro = obj.descripcion_parametro.endsWith(':') ? obj.descripcion_parametro.slice(0, -1) : obj.descripcion_parametro;
+            textoParaCopiar += ` ${descripcionParametro}: ${resultado}${vdr}\n`;
+        });
+    });
+
+    // Crear un elemento textarea temporal en el DOM
+    const textarea = document.createElement('textarea');
+    textarea.value = textoParaCopiar.trim();
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        // Intentar copiar el contenido seleccionado al portapapeles
+        const successful = document.execCommand('copy');
+        const msg = successful ? 'Contenido copiado al portapapeles en formato de lista.' : 'No se pudo copiar el contenido al portapapeles.';
+        console.log(msg);
+    } catch (err) {
+        console.error('Error al copiar al portapapeles: ', err);
+    }
+    // Limpiar removiendo el textarea temporal del DOM
+    document.body.removeChild(textarea);
+}
   async cargarDatosPaciente(orden, formato = "") {
     console.log("ORDEN - cargar Paciente", orden);
     if (this.tipo_user == 'int') {
@@ -659,6 +890,7 @@ export class ListaOrdenPage implements OnInit {
     })
   }
 
+  
   cargaPDF(idOrden, formato = "") {
     this.presentLoading()
     this.funcionesComunesIntra.renderizaPDFOrden(idOrden, 0, formato).then(pdf => {

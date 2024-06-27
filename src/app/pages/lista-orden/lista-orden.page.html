@@ -226,10 +226,20 @@
                   </ion-button>
                 -->
 
-                <!-- <ion-button *ngIf="orden.saldo<=0.00&&(orden.listo==1||(ativa_progress&&orden.progress>0))" (click)="cargarDatosPaciente(orden.nro_ord)"
+    
+
+                <!-- <ion-button *ngIf="orden.saldo<=0.00&&(orden.listo==1||(ativa_progress&&orden.progress>0))" (click)="cargarDatosPaciente2(orden.nro_ord)"
                   color="secondary">
-                  <ion-icon src="copy" size="large"></ion-icon>Copy Prass
+                  <ion-icon src="assets/icon/download-pdf.svg" size="large"> Copy Prass</ion-icon>
                 </ion-button> -->
+
+                <ion-button *ngIf="orden.saldo<=0.00&&(orden.listo==1||(ativa_progress&&orden.progress>0))" 
+                  (click)="abrirDialogoConfirmacion(orden.nro_ord)" color="secondary" style="border: 2px solid #3dc2ff">
+                    <ion-icon name="copy" size="medium"> </ion-icon>Copy Prass
+                </ion-button>
+      
+
+
                   <ion-button *ngIf="orden.saldo<=0.00&&(orden.listo==1||(ativa_progress&&orden.progress>0))" (click)="cargarDatosPaciente(orden.nro_ord)"
                     color="secondary">
                     <ion-icon src="assets/icon/download-pdf.svg" size="large"></ion-icon>

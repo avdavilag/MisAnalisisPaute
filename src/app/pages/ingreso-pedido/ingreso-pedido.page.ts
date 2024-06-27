@@ -333,6 +333,8 @@ export class IngresoPedidoPage implements OnInit {
     }
    console.log('tkkhis.lugar.ListEstadoListEstado', this.ListEstado);
 
+   console.log('this.lugar.codigo - this.lugar.codigo', this.lugar.codigo);
+
     if (this.lugar.codigo == 2) {
       this.checkTurno_avdg(this.lugar);
       this.estado = this.ListEstado[1]
@@ -360,14 +362,14 @@ export class IngresoPedidoPage implements OnInit {
               this.lugar = element
               if (element.descripcion === "CONSULTA EXTERNA") {
                 console.log("Consulta Externaa");
-                if (this.lugar.codigo == 2) {
+                if (this.lugar.codigo == 3) {
                   this.estado = this.ListEstado[1]
                 } else { this.estado = this.ListEstado[0] }
                 this.checkTurno_avdg(this.lugar);
 
               } else {
                 console.log("Otro tipo de turno");
-                if (this.lugar.codigo == 2) {
+                if (this.lugar.codigo == 1) {
                   this.estado = this.ListEstado[1]
                 } else { this.estado = this.ListEstado[0] }
               }
@@ -1390,7 +1392,7 @@ this.LimpiarTodo();
    // const nombre_medico = '';
   
     console.log("antes del query");
-    const result = await this.queryservice.getTurnoByDateById(cod_pac, '2024/06/12 14:00', '2024/06/12 18:00') as any;;
+    const result = await this.queryservice.getTurnoByDateById(cod_pac, fecha_inicial, fecha_final) as any;;
     console.log("resultado query");
    const vector_pedidos = result.data.getTurnoByDateById;
     console.log("Vector pedidos: ", vector_pedidos);
@@ -1462,7 +1464,7 @@ formatDateConsultaDatos(dateObject: Date): string {
       let dateObject = new Date(date_hoy);
       let fecha_inicial = this.formatDateConsultaDatos(dateObject);
       let dateObjectModified = new Date(dateObject.getTime());
-      dateObjectModified.setHours(dateObjectModified.getHours() - 8);
+      dateObjectModified.setHours(dateObjectModified.getHours() - 23);
       let fecha_final = this.formatDateConsultaDatos(dateObjectModified);
       // console.error('dateObjectModified - dateObjectModified de fecha_formato_modificada: ',fecha_inicial);
       // console.error('fecha_formato - fecha_formato de fecha_formato_modificada: ',fecha_final);
@@ -1572,10 +1574,13 @@ formatDateConsultaDatos(dateObject: Date): string {
      this.ListAnalisis_tempo_update_pedido.push(element);
      console.log("id_turno presentAlertUpdate: ", id_turno);
    }
+   
  }
-
+ if(this.inputHabitacion === null && this.inputHabitacion === '' && this.inputHabitacion === undefined){
+  this.inputHabitacion='';
+  }
  array_turno_array.push({ id_pedidos: this.pedido_duplicar.id_pedidos, id_turno: id_turno, num_ana: this.ListAnalisis_tempo_update_pedido.length });
- this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido,this.inputObservacion,this.inputFechaExamen);
+ this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido,this.inputObservacion,this.inputFechaExamen,this.inputHabitacion);
     } else {
         this.presentAlertChangeDate(this.inputFechaExamen);
     }
@@ -1608,8 +1613,9 @@ for (const element of this.ListaAnalisis) {
   }
 }
 
+console.log('inputHabitacion: ',this.inputHabitacion)
 array_turno_array.push({ id_pedidos: this.pedido_duplicar.id_pedidos, id_turno: id_turno, num_ana: this.ListAnalisis_tempo_update_pedido.length });
-this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido, this.inputObservacion, fecha_modificar);
+this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(this.ListAnalisis_tempo_update_pedido), this.ListAnalisis_tempo_update_pedido, this.inputObservacion, fecha_modificar,this.inputHabitacion);
         }
         }, {
           text: "No",
@@ -1621,7 +1627,8 @@ this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(
     await alert.present();
   }
 
-  async presentAddAnalisisPedido(json_datos, json_ana, lista,inputObservacion?,fecha_examen?) {
+
+  async presentAddAnalisisPedido(json_datos, json_ana, lista,inputObservacion?,fecha_examen?,nro_habitacion?) {
 
     const alert = await this.alertController.create({
       header: '! Esta Seguro !',
@@ -1631,7 +1638,7 @@ this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(
         {
           text: "Si",
           handler: () => {
-            this.queryservice.insertPedAnaxTur(json_datos, json_ana,inputObservacion,fecha_examen).then((result: any) => {
+            this.queryservice.insertPedAnaxTur(json_datos, json_ana,inputObservacion,fecha_examen,nro_habitacion).then((result: any) => {
               console.log("result insertPedAnaxTur en verificacion: ", result);
               if(result.data.insertPedAnaxTur.data === "0"){
                 this.toastservice.presentToast({ message: result.data.insertPedAnaxTur.mensaje, position: "buttom", color: "success" })
@@ -1652,7 +1659,6 @@ this.presentAddAnalisisPedido(JSON.stringify(array_turno_array), JSON.stringify(
     });
     await alert.present();
   }
-
   async presentViewUpdatePedido(lista_pedidos) {
 console.log("pedidos -+----: ", lista_pedidos);
 this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: lista_pedidos } });

@@ -368,3 +368,10 @@ ion-toolbar{
         display: none;
     }
   }
+  .custom-badge {
+    --background: #ea9daa;
+  color: white;
+  }
+  .title-small-font {
+    font-size: 10px; 
+  }
