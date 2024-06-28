@@ -4,8 +4,7 @@
     "versionApp":"misAnalisisOnlineDesa",
     
     "apiBaseHttps":false,
-    
-    "apiBaseUrl": "",
+    "apiBaseUrl": "192.168.100.190",
     "apiBasePuerto":9180,
     "apiBaseSubDir":"",
     "apiBasePuertoSsl":"",
@@ -108,9 +107,9 @@
     "active_lugar_pedido":true,
     "lugar_default":false,
     "listado_lugar_pedido":[
-        {"descripcion":"EMERGENCIA","codigo":2,"enable":true,"style":"emergencia"},
+        {"descripcion":"EMERGENCIA","codigo":3,"enable":true,"style":"emergencia"},
         {"descripcion":"HOSPITALIZACION","codigo":1,"enable":true,"style":"hospitalizacion"},
-        {"descripcion":"CONSULTA EXTERNA","codigo":3,"enable":true,"style":"consulta"}
+        {"descripcion":"CONSULTA EXTERNA","codigo":2,"enable":true,"style":"consulta"}
     
       ],
     

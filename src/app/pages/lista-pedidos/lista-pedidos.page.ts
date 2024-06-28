@@ -88,11 +88,12 @@ export class ListaPedidosPage implements OnInit {
 
 
     this.pedido_update=null;
-
-
+    this.flag_pintar_item = false;
   }
 
   ngOnInit() {
+    this.flag_pintar_item = false;
+    
     if (window.screen.width <= 768 || window.innerWidth <= 768) { // 768px portrait        
       this.tablet = true;
     } else {
@@ -115,21 +116,25 @@ export class ListaPedidosPage implements OnInit {
     this.colores_grid = ["#D6FFFA", "#FFFFEF", "#EAD6FF"]
 
 
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation && navigation.extras && navigation.extras.state) {
-      const state = navigation.extras.state as { lista_pedidos: any };
-      if (state.lista_pedidos !== null) {
-        console.log('Revisa por favor - lista_pedidos', state.lista_pedidos);
-        this.flag_pintar_item = true;
-        this.pedido_update=state.lista_pedidos.id_pedidos;
-       }
-     } else {
-      this.flag_pintar_item = false;
-      this.pedido_update=null;
-    }
+     const navigation = this.router.getCurrentNavigation();
+    console.log('navigation - Navigation: ', navigation.id)
+    this.pedido_update='';
+if(navigation.id===1){  
+  this.flag_pintar_item = true;
+  this.pedido_update='';
+}else{
+  this.flag_pintar_item = false;
+  if (navigation && navigation.extras && navigation.extras.state) {
+    const state = navigation.extras.state as { lista_pedidos: any };
+    if (state.lista_pedidos !== null) {
+      console.log('Revisa por favor - lista_pedidos', state.lista_pedidos);
+   //   this.flag_pintar_item = true;
+      this.pedido_update=state.lista_pedidos.id_pedidos;
+     }
+   }
+}
     console.log('Revisa por favor - flag_pintar_item', this.flag_pintar_item);
     console.log('pedido_update * pedido_update', this.pedido_update);
-    
   }
 
   ionViewWillEnter() {
@@ -138,11 +143,23 @@ export class ListaPedidosPage implements OnInit {
     this.lista_filtrar = [];
     this.lista_temporal = [];
 
-    console.log('flag_pintar_item - pedido_update: ', this.flag_pintar_item);
-    let fecha_hoy = new Date;
-    let dias = 7;
-    this.f_hasta = fecha_hoy.toISOString().split("T")[0];
-    this.f_desde = new Date(fecha_hoy.setDate(fecha_hoy.getDate() - dias)).toISOString().split("T")[0]
+
+    console.log('this.pedido_update*ionViwewWillEnter: ',this.pedido_update);
+    console.log('flag_pintar_item - update ', this.flag_pintar_item);
+    if(!this.flag_pintar_item){
+
+      let fecha_hoy = new Date;
+      let dias = 1;
+      this.f_hasta = fecha_hoy.toISOString().split("T")[0];
+      this.f_desde = new Date(fecha_hoy.setDate(fecha_hoy.getDate() - dias)).toISOString().split("T")[0]
+    }else{
+
+      let fecha_hoy = new Date;
+      let dias = 1;
+      this.f_hasta = fecha_hoy.toISOString().split("T")[0];
+      this.f_desde = new Date(fecha_hoy.setDate(fecha_hoy.getDate() - dias)).toISOString().split("T")[0]
+    }
+
     this.presentLoading();
     this.usuario = this.varGlobal.getEntidad();
     this.var_usr = this.varGlobal.getVarUsuario();

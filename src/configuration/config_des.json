@@ -108,9 +108,9 @@
     "active_lugar_pedido":true,
     "lugar_default":true,
     "listado_lugar_pedido":[
-        {"descripcion":"EMERGENCIA","codigo":2,"enable":true,"style":"emergencia"},
+        {"descripcion":"EMERGENCIA","codigo":3,"enable":true,"style":"emergencia"},
         {"descripcion":"HOSPITALIZACION","codigo":1,"enable":true,"style":"hospitalizacion"},
-        {"descripcion":"CONSULTA EXTERNA","codigo":3,"enable":true,"style":"consulta"}
+        {"descripcion":"CONSULTA EXTERNA","codigo":2,"enable":true,"style":"consulta"}
     
       ],
     
@@ -164,8 +164,8 @@
     "enable_descarga_facturas":false,
     "enable_envio_issfa":true,
     "id_plan_default_pedido":1,
-    "ref_tur_externo":3,
-    "ref_tur_emergencia":2,
+    "ref_tur_externo":2,
+    "ref_tur_emergencia":3,
     "ref_tur_hospitalizacion":1,
 
     "dbloque_name":["index","nro_ord","name"],

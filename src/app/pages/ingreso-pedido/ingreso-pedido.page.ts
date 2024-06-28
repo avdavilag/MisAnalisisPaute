@@ -315,12 +315,12 @@ export class IngresoPedidoPage implements OnInit {
     this.pac_sex_input_config = this.appConfig.pac_sex;
 
     this.ListLugar = this.appConfig.listado_lugar_pedido;
-    console.log("this.ListLugar verificar por favor: ",this.ListLugar) ;
+    console.warn("this.ListLugar verificar por favor: ",this.ListLugar) ;
     // console.log('this.ListLugar', this.ListLugar);
     // console.log('this.lugar', this.lugar);
     if (this.varGlobal.getLugarPedido() != '') {
       this.lugar = this.ListLugar.filter(r => r.codigo == this.varGlobal.getLugarPedido())
-      console.log('This.lugar verificar ahora mismo: ', this.lugar);
+      console.warn('This.lugar verificar ahora mismo: ', this.lugar);
       this.lugar = this.lugar[0];
       
     }
@@ -338,6 +338,7 @@ export class IngresoPedidoPage implements OnInit {
     if (this.lugar.codigo == 2) {
       this.checkTurno_avdg(this.lugar);
       this.estado = this.ListEstado[1]
+      console.warn('111: ')
     } else {
       if (this.lugar.codigo == 3) {
         this.checkTurno_avdg(this.lugar);
@@ -358,11 +359,11 @@ export class IngresoPedidoPage implements OnInit {
             text: element.descripcion,
             cssClass: "" + element.style,
             handler: () => {
-              console.log('Confirm Cancel: blah', element.descripcion);
+              console.warn('Confirm Cancel: blah', element.descripcion);
               this.lugar = element
               if (element.descripcion === "CONSULTA EXTERNA") {
                 console.log("Consulta Externaa");
-                if (this.lugar.codigo == 3) {
+                if (this.lugar.codigo ==2) {
                   this.estado = this.ListEstado[1]
                 } else { this.estado = this.ListEstado[0] }
                 this.checkTurno_avdg(this.lugar);
@@ -457,10 +458,10 @@ this.LimpiarTodo();
         nombre_lugar = 'HOSPITALIZACION';
         break;
       case 2:
-        nombre_lugar = 'EMERGENCIA';
+        nombre_lugar = 'CONSULTA EXTERNA';
         break;
       case 3:
-        nombre_lugar = 'CONSULTA EXTERNA';
+        nombre_lugar = 'EMERGENCIA';
         break;
       default:
         break;
@@ -1851,10 +1852,11 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
 
   changelugar(event) {
 
-    console.log("Entro en donde yo decidi enviar");
+        
     this.ListLugar.forEach(element => {
       if (element.codigo == event.detail.value) {
         this.lugar = element
+
         console.log("this.lugar  verificar-: ", this.lugar);
         this.checkTurno_avdg(this.lugar);
         return
@@ -1865,7 +1867,7 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
 
   LimpiarTodo() {
     let forden = new Date();
-    this.variable_activar_fecha
+    this.variable_activar_fecha=false;
     this.resetpaciente();
     this.desactivar_segment_nombre_cedula = false;
     this.ListaAnalisis = [];
@@ -1882,13 +1884,17 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
     this.total_ord = '';
     console.log("this.elegir_variable:  elegigir Variab=" + this.elegir_variable);
 
-    if (this.elegir_variable === undefined || this.elegir_variable === '' || this.elegir_variable === null) {
+   // if (this.elegir_variable === undefined || this.elegir_variable === '' || this.elegir_variable === null) {
       console.log("this.inputFechaExamen antes" + this.inputFechaExamen);
       console.log("helper" + this.helperservice.soloFecha(forden));      
       this.inputFechaExamen = this.helperservice.soloFecha(forden);
       this.pedido_duplicar=null;
-    }
+    //}
     console.log("this.despues" + this.inputFechaExamen);
+    console.log("this.lugar - LimpiarTodod" ,this.lugar);
+
+    // { descripcion: "CONSULTA EXTERNA", codigo: 2, enable: true, style: "consulta" }
+    this.lugar = { descripcion: "CONSULTA EXTERNA", codigo: 2, enable: true, style: "consulta" };
     this.checkTurno_avdg(this.lugar, this.inputFechaExamen, this.elegir_variable);
 
     if (!this.appConfig.lugar_default && this.appConfig.active_lugar_pedido) {
@@ -1897,10 +1903,28 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
 
   }
 
-
-
   openPDF(orden) {
+    let lugar_pdf;
     this.loadingservice.present("Generando Pdf")
+    console.log('orden - verificaaaaaados open PDf: ',orden);
+    console.log('orden - verificados open PDF: ', orden);
+    switch (orden.cod_lugar) {
+      case 2:
+        lugar_pdf = 3;
+        break;
+      case 1:
+        lugar_pdf = 1;
+        break;
+      case 3:
+        lugar_pdf = 2;
+        break;
+      default:
+        // Handle the case where cod_lugar is not 1, 2, or 3
+        console.error('cod_lugar desconocido:', orden.cod_lugar);
+        break;
+    }
+    orden.cod_lugar = lugar_pdf;
+    console.warn('orden - verificados open PDF: ', orden);
     // PREPARO LOS VALORES
     let valores_enviar = {
       "orden": orden
@@ -1909,6 +1933,7 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
     let respuesta;
     this.serviciosPDF.getPDFPedido(valores_enviar).subscribe(resp => {
       //CIERRO EL LOADING
+      
       setTimeout(() => {
         this.loadingservice.dismiss();
       }, 500);
@@ -1925,9 +1950,9 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
       } else {
         this.toastservice.presentToast({ position: "top", color: "dark", message: respuesta.description })
       }
-
+      
     }, error => {
-      setTimeout(() => {
+      setTimeout(() => {        
         this.loadingservice.dismiss();
       }, 500);
       console.error(error);
@@ -1949,8 +1974,8 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
   }
 
   checkTurno_avdg(lugar, fecha?, variable?) {
-    console.log('Entro a turnos verificar ahora Lugar', lugar);
-    console.log('Entro a turnos verificar ahora Fecha', fecha);
+    console.warn('Entro a turnos verificar ahora Lugar', lugar);
+    console.warn('Entro a turnos verificar ahora Fecha', fecha);
     if (lugar.descripcion === "CONSULTA EXTERNA") {
       console.warn('inputdate:::::::::::', this.inputFechaExamen);
 
@@ -2017,6 +2042,7 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
           // manejar cualquier otro caso aquí si es necesario
           break;
       }
+      console.log('ultimo inputfecha: ',this.inputFechaExamen);
     } else if (lugar.descripcion === "HOSPITALIZACION") {
       //this.opcion_fecha_turnos_eme = 'hoy';
       console.log('FALSE DE VARIABLE DE VARIABLE * fdsf: ' + variable);
@@ -2100,7 +2126,7 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
               this.cod_referencia = this.ref_tur_hospitalizacion_ip;
             }
             // console.log("this.cont_max_turnos_every: ",this.cont_max_turnos_every);        
-            // console.log("this.this.cod_referencia: ",this.cod_referencia);        
+            console.log("this.this.cod_referencia: ",this.cod_referencia);        
             //this.nro_max_turnos = this.flag_variable_feriados;
             this.nro_max_turnos = this.cont_max_turnos_every;
             this.queryservice.getMobFechasTurnos(this.inputFechaExamen, this.cod_referencia).then((result: any) => {
@@ -2119,6 +2145,8 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
               }
             });
           } else {
+            
+            console.error('Entra a this.lugar.descripcion ------',this.lugar.descripcion);
 
             if (this.lugar.descripcion === "CONSULTA EXTERNA") {
               this.cod_referencia = this.ref_tur_externo_ip;
@@ -2127,16 +2155,20 @@ this.router.navigate(['/home-medico/lista-pedidos'], { state: { lista_pedidos: l
             } if (this.lugar.descripcion === "HOSPITALIZACION") {
               this.cod_referencia = this.ref_tur_hospitalizacion_ip;
             }
-            // console.error('Entra a consulta feriados else------',this.cod_referencia);
+
+             console.error('Entra a consulta feriados else ------',this.cod_referencia);
             // console.error('Entra Examen else------',this.inputFechaExamen);
             // this.queryservice.getMobFechasTurnos(this.inputFechaExamen,this.cod_referencia).then((result: any) => {
             this.queryservice.getMobFechasTurnos(this.inputFechaExamen, this.cod_referencia).then(async (result: any) => {
               // console.log("Resultado para getMobFechasTurnos: ", result);
               this.contador_turno_dia = result.data.getMobFechasTurnos.data;
+              console.log('result: de result: ', result);
               let resultado = result.data.getMobFechasTurnos.resultado;
               if (resultado === "0") {
+                console.warn('En if: ',this.cod_referencia);
                 this.nro_max_turnos = 0;
               } else {
+                console.warn('En else: ',this.cod_referencia);
                 await this.getMaxTurnos();
                 // console.log('Verificando 11: ',this.nro_max_turnos);                                                     
               }

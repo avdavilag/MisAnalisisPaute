@@ -133,7 +133,7 @@
 
               <ion-segment color="secondary" scrollable [value]="pedido_lugar_select"
                 (ionChange)="segmentChanged_pedido($event)"
-                [class]="(pedido_lugar_select==2)?'estilo_tipo_emergency' :'estilo_tipo_'+estilo_pagina" mode="md">
+                [class]="(pedido_lugar_select==3)?'estilo_tipo_emergency' :'estilo_tipo_'+pedido_lugar_select" mode="md">
                 <ion-segment-button *ngFor="let item of this.listado_lugar_pedido" [hidden]="(item.enable?false:true)"
                   [value]="item.codigo" layout="icon-top">
                   <ion-label>{{item.descripcion}}</ion-label>

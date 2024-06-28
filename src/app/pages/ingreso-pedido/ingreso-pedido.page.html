@@ -342,7 +342,7 @@
               <!-- border-left: 0.5px solid darkgrey; -->
               <ion-segment class="segment_custom" [value]="lugar.codigo" (ionChange)="changelugar($event)" style="border-radius: 8px;">
                 <ion-segment-button *ngFor="let item of ListLugar" [value]="item.codigo" class="ion-text-wrap"
-                  [style]="(lugar.codigo==2)?'--background-checked:#d80000':(lugar.codigo==1)?'--background-checked:#5ccfae':(lugar.codigo==3)?'--background-checked:#7479ff':''"
+                  [style]="(lugar.codigo==3)?'--background-checked:#d80000':(lugar.codigo==1)?'--background-checked:#5ccfae':(lugar.codigo==2)?'--background-checked:#7479ff':''"
                   [hidden]="(item.enable?false:true)" [value]="item.codigo">
                   {{item.descripcion}} </ion-segment-button>
               </ion-segment>

@@ -115,8 +115,9 @@ ion-card {
       opacity: 0;
     }
     .segment-button-checked {
-      border: solid;
-      border-color: #3dc2ff;
+      background: #5ccfae;
+      //border: solid;
+      //border-color: #3dc2ff;
       .segment-button-indicator {
         opacity: 0;
       }
@@ -276,8 +277,16 @@ ion-card {
       opacity: 0;
     }
     .segment-button-checked {
-      border: solid;
-      border-color: #3dc2ff;
+      background: #5ccfae;
+      color: white;
+      //border: solid;
+      //border-color: #3dc2ff;
+      ion-label {
+        color: white;
+      }
+      ion-icon {
+        color: white;
+      }
       .segment-button-indicator {
         opacity: 0;
       }
